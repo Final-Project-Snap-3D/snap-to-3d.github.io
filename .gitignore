@@ -1,0 +1,17 @@
+# Claude Code
+.claude/
+.claude/*
+CLAUDE.md
+.claude.json
+.mcp.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
+*.log

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Snap to 3D — De la foto al modelo 3D</title>
+  <meta
+    name="description"
+    content="Snap to 3D convierte fotos y capturas en modelos 3D listos para usar. Documentación técnica del proyecto."
+  />
+
+  <!-- Stylesheet principal del proyecto -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <!--
+    Tema: aplica la elección guardada ANTES de pintar para evitar parpadeo.
+    Si no hay elección manual, el CSS usa la preferencia del navegador
+    (prefers-color-scheme) de forma automática.
+  -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("theme");
+        if (t === "light" || t === "dark") {
+          document.documentElement.setAttribute("data-theme", t);
+        }
+      } catch (e) {}
+    })();
+  </script>
+</head>
+
+<body>
+  <!-- ===================== HEADER / NAV STICKY ===================== -->
+  <header class="site-header" id="top">
+    <nav class="nav container" aria-label="Navegación principal">
+      <a class="brand" href="#top">
+        <span class="brand__mark" aria-hidden="true">◧</span>
+        <span class="brand__name">Snap<span class="brand__accent">to</span>3D</span>
+      </a>
+
+      <ul class="nav__menu" id="navMenu">
+        <li><a href="#que-es">¿Qué es?</a></li>
+        <li><a href="#como-funciona">Cómo funciona</a></li>
+        <li><a href="#demo">Demo</a></li>
+        <li><a href="#arquitectura">Arquitectura</a></li>
+        <li><a href="#roadmap">Roadmap</a></li>
+        <li><a class="nav__cta" href="#demo">Ver demostración</a></li>
+      </ul>
+
+      <div class="nav__controls">
+        <!-- Cambio de tema claro/oscuro (auto por defecto según el navegador) -->
+        <button
+          class="theme-toggle"
+          id="themeToggle"
+          type="button"
+          aria-label="Cambiar entre tema claro y oscuro"
+        >
+          <span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true">☀</span>
+          <span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true">☾</span>
+        </button>
+
+        <!-- Toggle de menú para móvil -->
+        <button
+          class="nav__toggle"
+          id="navToggle"
+          aria-expanded="false"
+          aria-controls="navMenu"
+          aria-label="Abrir menú"
+        >
+          <span class="nav__toggle-bar"></span>
+          <span class="nav__toggle-bar"></span>
+          <span class="nav__toggle-bar"></span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ===================== HERO ===================== -->
+    <section class="hero" id="hero">
+      <!-- Vídeo de fondo en loop. Cuando exista assets/video/hero.mp4 se reproducirá;
+           mientras tanto el placeholder (.hero__media-fallback) queda visible debajo. -->
+      <div class="hero__media" aria-hidden="true">
+        <!--
+        <video
+          class="hero__video"
+          autoplay
+          muted
+          loop
+          playsinline
+          poster="assets/img/hero-poster.jpg"
+        >
+          <source src="assets/video/hero.mp4" type="video/mp4" />
+        </video>
+        -->
+        <div class="hero__media-fallback media-placeholder media-placeholder--video">
+          <span class="media-placeholder__label">Vídeo de fondo (loop)</span>
+        </div>
+      </div>
+
+      <div class="hero__overlay container">
+        <p class="hero__eyebrow">Proyecto académico · Universitat Politècnica de Catalunya</p>
+        <h1 class="hero__title">Snap to 3D</h1>
+        <p class="hero__subtitle">
+          Sistema para la reconstrucción de modelos tridimensionales a partir
+          de imágenes bidimensionales, mediante técnicas de visión por
+          computador y aprendizaje automático. Documentación técnica del proyecto.
+        </p>
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="#demo">Ver demostración</a>
+          <a class="btn btn--ghost" href="#que-es">Más información</a>
+        </div>
+      </div>
+
+      <a class="hero__scroll" href="#que-es" aria-label="Bajar a la siguiente sección">
+        <span class="hero__scroll-dot"></span>
+      </a>
+    </section>
+
+    <!-- ===================== ¿QUÉ ES? ===================== -->
+    <section class="section" id="que-es">
+      <div class="container section__grid">
+        <div class="section__text">
+          <p class="section__eyebrow">Visión general</p>
+          <h2 class="section__title">¿Qué es Snap to 3D?</h2>
+          <p class="section__lead">
+            Snap to 3D es un proyecto de investigación aplicada cuyo objetivo es
+            transformar imágenes bidimensionales en representaciones
+            tridimensionales, empleando técnicas de visión por computador y
+            aprendizaje automático.
+          </p>
+          <p>
+            <!-- TODO: Reemplazar por la descripción definitiva del proyecto -->
+            Contenido provisional. El proyecto busca facilitar la generación de
+            contenido 3D a partir de una única fotografía, obteniendo un activo
+            digital reutilizable en ámbitos como los videojuegos, el comercio
+            electrónico, la realidad aumentada o la fabricación aditiva, sin
+            requerir conocimientos previos de modelado.
+          </p>
+          <ul class="feature-list">
+            <li>No requiere software especializado ni formación previa.</li>
+            <li>Exportación a formatos estándar de la industria (glTF, OBJ, STL).</li>
+            <li>Concebido para integrarse en flujos de trabajo existentes.</li>
+          </ul>
+        </div>
+
+        <!-- Imagen ilustrativa. Sustituir por assets/img/overview.jpg -->
+        <figure class="section__media">
+          <div class="media-placeholder media-placeholder--image media-placeholder--tall">
+            <span class="media-placeholder__label">Imagen ilustrativa</span>
+          </div>
+          <figcaption class="media-caption">
+            Ejemplo de transformación de foto a malla 3D.
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ===================== CÓMO FUNCIONA ===================== -->
+    <section class="section section--alt" id="como-funciona">
+      <div class="container">
+        <header class="section__header">
+          <p class="section__eyebrow">El proceso</p>
+          <h2 class="section__title">Cómo funciona</h2>
+          <p class="section__lead section__lead--center">
+            El proceso se estructura en tres etapas, desde la imagen de entrada
+            hasta el modelo tridimensional.
+          </p>
+        </header>
+
+        <ol class="steps">
+          <li class="step">
+            <div class="step__icon" aria-hidden="true">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                <circle cx="12" cy="13" r="4" />
+              </svg>
+            </div>
+            <span class="step__number">01</span>
+            <h3 class="step__title">Captura</h3>
+            <p class="step__text">
+              Se proporciona una fotografía o captura del objeto. No se requiere
+              equipo profesional: es suficiente con la cámara de un dispositivo móvil.
+            </p>
+          </li>
+
+          <li class="step">
+            <div class="step__icon" aria-hidden="true">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="4" width="16" height="16" rx="2" />
+                <rect x="9" y="9" width="6" height="6" />
+                <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3" />
+              </svg>
+            </div>
+            <span class="step__number">02</span>
+            <h3 class="step__title">Procesado</h3>
+            <p class="step__text">
+              El sistema analiza la imagen, estima la geometría y genera la malla
+              junto con sus texturas de forma automática.
+            </p>
+          </li>
+
+          <li class="step">
+            <div class="step__icon" aria-hidden="true">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                <line x1="12" y1="22.08" x2="12" y2="12" />
+              </svg>
+            </div>
+            <span class="step__number">03</span>
+            <h3 class="step__title">Modelo 3D</h3>
+            <p class="step__text">
+              El resultado se exporta en el formato deseado, listo para su uso en
+              motores gráficos, visores o sistemas de impresión 3D.
+            </p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ===================== DEMO ===================== -->
+    <section class="section" id="demo">
+      <div class="container">
+        <header class="section__header">
+          <p class="section__eyebrow">En acción</p>
+          <h2 class="section__title">Demo</h2>
+          <p class="section__lead section__lead--center">
+            Galería de ejemplos en bucle. Los assets reales se añadirán más adelante.
+          </p>
+        </header>
+
+        <div class="gallery">
+          <!-- Vídeo demo 1. Sustituir por assets/video/demo-1.mp4 -->
+          <figure class="gallery__item">
+            <!--
+            <video class="gallery__video" autoplay muted loop playsinline poster="assets/img/demo-1-poster.jpg">
+              <source src="assets/video/demo-1.mp4" type="video/mp4" />
+            </video>
+            -->
+            <div class="media-placeholder media-placeholder--video">
+              <span class="media-placeholder__label">Vídeo demo (loop)</span>
+            </div>
+            <figcaption class="media-caption">Reconstrucción de una silla.</figcaption>
+          </figure>
+
+          <!-- Vídeo demo 2. Sustituir por assets/video/demo-2.mp4 -->
+          <figure class="gallery__item">
+            <!--
+            <video class="gallery__video" autoplay muted loop playsinline poster="assets/img/demo-2-poster.jpg">
+              <source src="assets/video/demo-2.mp4" type="video/mp4" />
+            </video>
+            -->
+            <div class="media-placeholder media-placeholder--video">
+              <span class="media-placeholder__label">Vídeo demo (loop)</span>
+            </div>
+            <figcaption class="media-caption">Rotación 360° de un objeto.</figcaption>
+          </figure>
+
+          <!-- Imagen demo. Sustituir por assets/img/demo-3.jpg -->
+          <figure class="gallery__item">
+            <div class="media-placeholder media-placeholder--image">
+              <span class="media-placeholder__label">Imagen</span>
+            </div>
+            <figcaption class="media-caption">Antes / después del procesado.</figcaption>
+          </figure>
+
+          <!-- Imagen demo. Sustituir por assets/img/demo-4.jpg -->
+          <figure class="gallery__item">
+            <div class="media-placeholder media-placeholder--image">
+              <span class="media-placeholder__label">Imagen</span>
+            </div>
+            <figcaption class="media-caption">Malla con wireframe visible.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ARQUITECTURA TÉCNICA ===================== -->
+    <section class="section section--alt" id="arquitectura">
+      <div class="container">
+        <header class="section__header">
+          <p class="section__eyebrow">Bajo el capó</p>
+          <h2 class="section__title">Arquitectura técnica</h2>
+          <p class="section__lead section__lead--center">
+            Visión de alto nivel de los componentes del sistema.
+          </p>
+        </header>
+
+        <!-- Diagrama de arquitectura. Sustituir por assets/img/architecture.svg -->
+        <figure class="section__media section__media--wide">
+          <div class="media-placeholder media-placeholder--diagram">
+            <span class="media-placeholder__label">Diagrama de arquitectura</span>
+          </div>
+          <figcaption class="media-caption">
+            Flujo: cliente → API de ingesta → pipeline de procesado → almacenamiento de modelos.
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ===================== ROADMAP / ESTADO ===================== -->
+    <section class="section" id="roadmap">
+      <div class="container">
+        <header class="section__header">
+          <p class="section__eyebrow">Hacia dónde vamos</p>
+          <h2 class="section__title">Roadmap y estado del proyecto</h2>
+        </header>
+
+        <ul class="roadmap">
+          <li class="roadmap__item roadmap__item--done">
+            <span class="roadmap__badge">Hecho</span>
+            <h3 class="roadmap__title">Prueba de concepto</h3>
+            <p>Pipeline básico de imagen a malla validado con ejemplos internos.</p>
+          </li>
+          <li class="roadmap__item roadmap__item--progress">
+            <span class="roadmap__badge">En curso</span>
+            <h3 class="roadmap__title">Mejora de calidad</h3>
+            <p>Optimización de texturas y reducción de artefactos en la geometría.</p>
+          </li>
+          <li class="roadmap__item">
+            <span class="roadmap__badge">Planificado</span>
+            <h3 class="roadmap__title">API pública</h3>
+            <p>Endpoints documentados para integrar el procesado en terceros.</p>
+          </li>
+          <li class="roadmap__item">
+            <span class="roadmap__badge">Planificado</span>
+            <h3 class="roadmap__title">Visor web interactivo</h3>
+            <p>Previsualización 3D en el navegador antes de descargar.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="site-footer">
+    <div class="container footer__grid">
+      <div class="footer__brand">
+        <span class="brand__name">Snap<span class="brand__accent">to</span>3D</span>
+        <p class="footer__tagline">De la imagen al modelo tridimensional.</p>
+
+        <!-- Bloque institucional. El logo se oculta automáticamente si aún no existe el archivo. -->
+        <div class="footer__institution">
+          <img
+            src="assets/img/logoUPC.png"
+            alt="Universitat Politècnica de Catalunya (UPC)"
+            class="footer__logo"
+            onerror="this.style.display='none'"
+          />
+          <p class="footer__institution-text">
+            Proyecto académico desarrollado en la<br />
+            Universitat Politècnica de Catalunya (UPC).
+          </p>
+        </div>
+      </div>
+
+      <nav class="footer__links" aria-label="Enlaces del pie">
+        <h4 class="footer__heading">Proyecto</h4>
+        <ul>
+          <li><a href="#que-es">¿Qué es?</a></li>
+          <li><a href="#como-funciona">Cómo funciona</a></li>
+          <li><a href="#roadmap">Roadmap</a></li>
+        </ul>
+      </nav>
+
+      <nav class="footer__links" aria-label="Enlaces externos">
+        <h4 class="footer__heading">Enlaces</h4>
+        <ul>
+          <!-- TODO: actualizar con las URLs reales -->
+          <li><a href="#" rel="noopener">Repositorio</a></li>
+          <li><a href="#" rel="noopener">Documentación</a></li>
+          <li><a href="#" rel="noopener">Contacto</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="footer__bottom container">
+      <p>&copy; <span id="year">2026</span> Snap to 3D. Documentación del proyecto.</p>
+      <a href="#top" class="footer__totop">Volver arriba ↑</a>
+    </div>
+  </footer>
+
+  <!-- Script principal -->
+  <script src="main.js"></script>
+</body>
+</html>
