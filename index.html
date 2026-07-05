@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Snap to 3D — De la foto al modelo 3D</title>
+  <title>Snap to 3D — From photos to a 3D model</title>
   <meta
     name="description"
-    content="Snap to 3D convierte unas pocas fotos de móvil en una malla 3D editable e imprimible, combinando segmentación (YOLO26) y reconstrucción feed-forward (VGGT-Ω). Documentación técnica del proyecto."
+    content="Snap to 3D turns a handful of smartphone photos into an editable, printable 3D mesh, combining segmentation (YOLO26) and feed-forward reconstruction (VGGT-Ω). Project technical documentation."
   />
 
-  <!-- Stylesheet principal del proyecto -->
+  <!-- Main project stylesheet -->
   <link rel="stylesheet" href="styles.css" />
 
   <!--
-    Tema: aplica la elección guardada ANTES de pintar para evitar parpadeo.
-    Si no hay elección manual, el CSS usa la preferencia del navegador
-    (prefers-color-scheme) de forma automática.
+    Theme: apply the saved choice BEFORE painting to avoid a flash.
+    Without a manual choice, the CSS follows the browser preference
+    (prefers-color-scheme) automatically.
   -->
   <script>
     (function () {
@@ -30,22 +30,22 @@
 </head>
 
 <body>
-  <!-- ===================== HEADER / NAV STICKY ===================== -->
+  <!-- ===================== HEADER / STICKY NAV ===================== -->
   <header class="site-header" id="top">
-    <nav class="nav container" aria-label="Navegación principal">
+    <nav class="nav container" aria-label="Main navigation">
       <a class="brand" href="#top">
         <span class="brand__mark" aria-hidden="true">◧</span>
         <span class="brand__name">Snap<span class="brand__accent">to</span>3D</span>
       </a>
 
       <ul class="nav__menu" id="navMenu">
-        <li><a href="#que-es">¿Qué es?</a></li>
-        <li><a href="#como-funciona">Cómo funciona</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#how-it-works">How it works</a></li>
         <li><a href="#dataset">Dataset</a></li>
-        <li><a href="#segmentacion">Segmentación</a></li>
-        <li><a href="#reconstruccion">Reconstrucción 3D</a></li>
-        <li><a href="#sistema">Sistema</a></li>
-        <li><a href="#roadmap">Conclusiones</a></li>
+        <li><a href="#segmentation">Segmentation</a></li>
+        <li><a href="#reconstruction">3D Reconstruction</a></li>
+        <li><a href="#system">System</a></li>
+        <li><a href="#conclusions">Conclusions</a></li>
         <li>
           <a
             class="nav__cta"
@@ -57,24 +57,24 @@
       </ul>
 
       <div class="nav__controls">
-        <!-- Cambio de tema claro/oscuro (auto por defecto según el navegador) -->
+        <!-- Light/dark theme toggle (auto by default following the browser) -->
         <button
           class="theme-toggle"
           id="themeToggle"
           type="button"
-          aria-label="Cambiar entre tema claro y oscuro"
+          aria-label="Toggle light and dark theme"
         >
           <span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true">☀</span>
           <span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true">☾</span>
         </button>
 
-        <!-- Toggle de menú para móvil -->
+        <!-- Mobile menu toggle -->
         <button
           class="nav__toggle"
           id="navToggle"
           aria-expanded="false"
           aria-controls="navMenu"
-          aria-label="Abrir menú"
+          aria-label="Open menu"
         >
           <span class="nav__toggle-bar"></span>
           <span class="nav__toggle-bar"></span>
@@ -87,8 +87,8 @@
   <main>
     <!-- ===================== HERO ===================== -->
     <section class="hero" id="hero">
-      <!-- Vídeo de fondo en loop. Cuando exista assets/video/hero.mp4 se reproducirá;
-           mientras tanto el placeholder (.hero__media-fallback) queda visible debajo. -->
+      <!-- Looping background video. When assets/video/hero.mp4 exists it will play;
+           until then the placeholder (.hero__media-fallback) stays visible below. -->
       <div class="hero__media" aria-hidden="true">
         <!--
         <video
@@ -103,24 +103,24 @@
         </video>
         -->
         <div class="hero__media-fallback media-placeholder media-placeholder--video">
-          <span class="media-placeholder__label">Vídeo de fondo (loop)</span>
+          <span class="media-placeholder__label">Background video (loop)</span>
         </div>
       </div>
 
       <div class="hero__overlay container">
         <p class="hero__eyebrow">
-          Proyecto final · Posgrado en Artificial Intelligence with Deep Learning · UPC School (2026)
+          Final project · Postgraduate in Artificial Intelligence with Deep Learning · UPC School (2026)
         </p>
         <h1 class="hero__title">Snap to 3D</h1>
         <p class="hero__subtitle">
-          De unas pocas fotos de móvil a una malla 3D editable e imprimible
-          (<code>.obj</code> / <code>.ply</code> / <code>.stl</code>), lista para Blender.
-          Sin escáner, sin plataforma giratoria, sin calibración: solo unas
-          cuantas fotos del objeto desde distintos ángulos.
+          From a handful of smartphone photos to an editable, printable 3D mesh
+          (<code>.obj</code> / <code>.ply</code> / <code>.stl</code>), ready for Blender.
+          No scanner, no turntable, no calibration rig: just a few shots of the
+          object from different angles.
         </p>
         <p class="hero__meta">
-          <strong>Autores:</strong> Maria Bertolín · Marc Borràs · Marc Castellana · Gerard Rosell
-          &nbsp;·&nbsp; <strong>Tutor:</strong> Pablo Vega
+          <strong>Authors:</strong> Maria Bertolín · Marc Borràs · Marc Castellana · Gerard Rosell
+          &nbsp;·&nbsp; <strong>Advisor:</strong> Pablo Vega
         </p>
         <div class="hero__actions">
           <a
@@ -128,55 +128,54 @@
             href="https://github.com/Final-Project-Snap-3D/SegmentationModel_PP_AI"
             target="_blank"
             rel="noopener"
-          >Ver el código en GitHub</a>
-          <a class="btn btn--ghost" href="#como-funciona">Cómo funciona</a>
+          >View the code on GitHub</a>
+          <a class="btn btn--ghost" href="#how-it-works">How it works</a>
         </div>
       </div>
 
-      <a class="hero__scroll" href="#que-es" aria-label="Bajar a la siguiente sección">
+      <a class="hero__scroll" href="#about" aria-label="Scroll to the next section">
         <span class="hero__scroll-dot"></span>
       </a>
     </section>
 
-    <!-- ===================== ¿QUÉ ES? ===================== -->
-    <section class="section" id="que-es">
+    <!-- ===================== ABOUT ===================== -->
+    <section class="section" id="about">
       <div class="container">
         <header class="section__header">
-          <p class="section__eyebrow">Visión general</p>
-          <h2 class="section__title">¿Qué es Snap to 3D?</h2>
+          <p class="section__eyebrow">Overview</p>
+          <h2 class="section__title">What is Snap to 3D?</h2>
           <p class="section__lead section__lead--center">
-            Snap-to-3D es una pipeline de extremo a extremo que convierte un
-            puñado de fotos casuales de móvil de un objeto real en una malla 3D
-            editable e imprimible, combinando visión por computador clásica y
-            aprendizaje profundo.
+            Snap-to-3D is an end-to-end pipeline that turns a handful of casual
+            smartphone photos of a real-world object into an editable, printable
+            3D mesh, combining classical computer vision and deep learning.
           </p>
         </header>
 
         <div class="section__text" style="max-width: 760px; margin-inline: auto;">
           <p>
-            El objetivo es hacer accesible la creación de activos 3D a
-            cualquiera que tenga un teléfono. Aplicaciones concretas:
+            The goal is to make 3D asset creation accessible to anyone with a
+            phone. Concrete applications:
           </p>
           <ul class="feature-list feature-list--grid">
-            <li><strong>E-commerce</strong> — vistas 3D de producto a partir de una sesión rápida de fotos.</li>
-            <li><strong>Gemelos digitales</strong> — captura de activos físicos para simulación o inventario.</li>
-            <li><strong>Patrimonio cultural</strong> — digitalización de objetos para su preservación y estudio.</li>
-            <li><strong>Impresión 3D</strong> — mallas <em>watertight</em> listas para laminar e imprimir.</li>
+            <li><strong>E-commerce</strong> — 3D product views from a quick photo session.</li>
+            <li><strong>Digital twins</strong> — capture physical assets for simulation or inventory.</li>
+            <li><strong>Cultural heritage</strong> — digitize objects for preservation and study.</li>
+            <li><strong>3D printing</strong> — <em>watertight</em> meshes ready to slice and print.</li>
           </ul>
         </div>
       </div>
     </section>
 
-    <!-- ===================== CÓMO FUNCIONA ===================== -->
-    <section class="section section--alt" id="como-funciona">
+    <!-- ===================== HOW IT WORKS ===================== -->
+    <section class="section section--alt" id="how-it-works">
       <div class="container">
         <header class="section__header">
-          <p class="section__eyebrow">El proceso</p>
-          <h2 class="section__title">Cómo funciona</h2>
+          <p class="section__eyebrow">The process</p>
+          <h2 class="section__title">How it works</h2>
           <p class="section__lead section__lead--center">
-            Las imágenes de entrada siguen dos ramas en paralelo — segmentación
-            y reconstrucción — que se fusionan para aislar el objeto antes del
-            mallado final.
+            Input images follow two parallel branches — segmentation and
+            reconstruction — which merge to isolate the object before the final
+            meshing.
           </p>
         </header>
 
@@ -189,11 +188,11 @@
               </svg>
             </div>
             <span class="step__number">01</span>
-            <h3 class="step__title">Captura</h3>
+            <h3 class="step__title">Capture</h3>
             <p class="step__text">
-              N fotos del objeto desde distintos ángulos con el móvil (JPG, PNG
-              y HEIC/HEIF). El fondo se conserva: aporta el contexto geométrico
-              que la reconstrucción necesita para estimar las cámaras.
+              N photos of the object from different angles with a phone (JPG, PNG
+              and HEIC/HEIF). The background is kept: it provides the geometric
+              context reconstruction needs to estimate the cameras.
             </p>
           </li>
 
@@ -206,12 +205,12 @@
               </svg>
             </div>
             <span class="step__number">02</span>
-            <h3 class="step__title">Segmentación + Reconstrucción</h3>
+            <h3 class="step__title">Segmentation + Reconstruction</h3>
             <p class="step__text">
-              En paralelo: <strong>YOLO26-seg</strong> genera la máscara binaria
-              del objeto y <strong>VGGT-Ω</strong> recupera poses de cámara,
-              mapas de profundidad y una nube de puntos densa. La máscara anula
-              la confianza de los píxeles de fondo y filtra la nube.
+              In parallel: <strong>YOLO26-seg</strong> produces the object's
+              binary mask and <strong>VGGT-Ω</strong> recovers camera poses,
+              depth maps and a dense point cloud. The mask zeroes the confidence
+              of background pixels and filters the cloud.
             </p>
           </li>
 
@@ -224,12 +223,11 @@
               </svg>
             </div>
             <span class="step__number">03</span>
-            <h3 class="step__title">Malla 3D</h3>
+            <h3 class="step__title">3D Mesh</h3>
             <p class="step__text">
-              <strong>PyMeshLab</strong> (Screened Poisson) convierte la nube
-              filtrada en una malla <em>watertight</em> exportada como
-              .obj / .ply / .stl, lista para Blender, motores gráficos o
-              impresión 3D.
+              <strong>PyMeshLab</strong> (Screened Poisson) turns the filtered
+              cloud into a <em>watertight</em> mesh exported as
+              .obj / .ply / .stl, ready for Blender, game engines or 3D printing.
             </p>
           </li>
         </ol>
@@ -238,12 +236,12 @@
           <img
             class="media-frame"
             src="assets/img/pipeline.png"
-            alt="Diagrama de la pipeline: fotos de entrada, ramas de segmentación y VGGT-Ω, filtrado por máscara y mallado"
+            alt="Pipeline diagram: input photos, segmentation and VGGT-Ω branches, mask filtering and meshing"
             loading="lazy"
           />
           <figcaption class="media-caption">
-            Vista general de la pipeline: segmentación y VGGT-Ω en paralelo,
-            filtrado por máscara y mallado con PyMeshLab.
+            Pipeline overview: segmentation and VGGT-Ω in parallel, mask
+            filtering, and meshing with PyMeshLab.
           </figcaption>
         </figure>
       </div>
@@ -253,31 +251,30 @@
     <section class="section" id="dataset">
       <div class="container">
         <header class="section__header">
-          <p class="section__eyebrow">Los datos</p>
+          <p class="section__eyebrow">The data</p>
           <h2 class="section__title">Dataset: VizWiz</h2>
           <p class="section__lead section__lead--center">
-            La etapa de segmentación se entrena con
+            The segmentation stage is trained on
             <a href="https://vizwiz.org/tasks-and-datasets/salient-object-detection/" target="_blank" rel="noopener"><strong>VizWiz Salient Object Detection</strong></a>,
-            un dataset de fotos tomadas por personas ciegas o con baja visión.
+            a dataset of photos taken by blind and low-vision users.
           </p>
         </header>
 
         <div class="section__grid">
           <div class="section__text">
             <p>
-              Son capturas móviles del mundo real — con ruido, iluminación
-              diversa, fondos desordenados, desenfoque de movimiento y encuadres
-              descentrados — condiciones mucho más parecidas a las que nuestra
-              pipeline debe afrontar que las de un dataset de estudio.
+              These are real-world mobile captures — noisy, with diverse
+              lighting, cluttered backgrounds, motion blur and off-center
+              framing — conditions much closer to what our pipeline must handle
+              than a clean studio dataset.
             </p>
             <p>
-              Dos rasgos condicionan la tarea de aprendizaje: el
-              <strong>68 % de las imágenes llevan texto superpuesto</strong>
-              sobre el objeto saliente, y este suele <strong>ocupar buena parte
-              del encuadre</strong>. Las anotaciones son polígonos del objeto
-              (un JSON por split) que rasterizamos a máscaras binarias con
-              <code>cv2.fillPoly</code>; usamos los splits oficiales del
-              challenge VizWiz SOD, sin re-particionar.
+              Two traits shape the learning task: <strong>68% of images carry
+              text overlaid</strong> on the salient object, and the object
+              usually <strong>occupies a large part of the frame</strong>.
+              Annotations are polygons of the object (one JSON per split) that
+              we rasterize into binary masks with <code>cv2.fillPoly</code>; we
+              use the official VizWiz SOD splits directly, without re-splitting.
             </p>
           </div>
 
@@ -285,13 +282,13 @@
             <div class="data-table-wrap">
               <table class="data-table">
                 <thead>
-                  <tr><th>Split</th><th>Imágenes</th></tr>
+                  <tr><th>Split</th><th>Images</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td>Train</td><td>19 116</td></tr>
-                  <tr><td>Val</td><td>6 105</td></tr>
-                  <tr><td>Test</td><td>6 779</td></tr>
-                  <tr class="is-highlight"><td>Total</td><td>32 000</td></tr>
+                  <tr><td>Train</td><td>19,116</td></tr>
+                  <tr><td>Val</td><td>6,105</td></tr>
+                  <tr><td>Test</td><td>6,779</td></tr>
+                  <tr class="is-highlight"><td>Total</td><td>32,000</td></tr>
                 </tbody>
               </table>
             </div>
@@ -300,210 +297,207 @@
       </div>
     </section>
 
-    <!-- ===================== SEGMENTACIÓN ===================== -->
-    <section class="section section--alt" id="segmentacion">
+    <!-- ===================== SEGMENTATION ===================== -->
+    <section class="section section--alt" id="segmentation">
       <div class="container">
         <header class="section__header">
-          <p class="section__eyebrow">Etapa 1</p>
-          <h2 class="section__title">Segmentación del objeto</h2>
+          <p class="section__eyebrow">Stage 1</p>
+          <h2 class="section__title">Object segmentation</h2>
           <p class="section__lead section__lead--center">
-            Iteramos tres arquitecturas hasta dar con la combinación adecuada
-            de calidad de máscara y robustez.
+            We iterated over three architectures until we found the right balance
+            of mask quality and robustness.
           </p>
         </header>
 
         <div class="section__text" style="max-width: 820px; margin-inline: auto;">
           <p>
-            <strong>1 · UNet desde cero.</strong> Encoder–decoder clásico con
-            <em>skip connections</em>, implementado de cero y entrenado en
-            VizWiz con loss BCE + Dice (0.3 / 0.7), optimizador AdamW y
-            BatchNorm entre convolución y ReLU para estabilizar el arranque.
-            Los resultados no fueron satisfactorios: máscaras imprecisas e
-            inestables.
+            <strong>1 · UNet from scratch.</strong> A classic encoder–decoder
+            with <em>skip connections</em>, implemented from scratch and trained
+            on VizWiz with BCE + Dice loss (0.3 / 0.7), the AdamW optimizer and
+            BatchNorm between convolution and ReLU to stabilize training from
+            zero. Results were not satisfactory: imprecise, unstable masks.
           </p>
           <p>
-            <strong>2 · U²-Net.</strong> Los bloques RSU anidados con
-            <strong>supervisión profunda</strong> supusieron una mejora
-            drástica. La red produce 7 máscaras (una fusionada + 6 salidas
-            laterales a distintas escalas) y todas se penalizan durante el
-            entrenamiento: esto da un gradiente fuerte a las capas intermedias y
-            features coherentes a múltiples escalas. Contornos mucho más
-            limpios, aunque con errores residuales.
+            <strong>2 · U²-Net.</strong> The nested RSU blocks with
+            <strong>deep supervision</strong> brought a dramatic improvement.
+            The network produces 7 masks (one fused + 6 side outputs at
+            different scales) and all of them are penalized during training:
+            this gives a strong gradient to the intermediate layers and coherent
+            multi-scale features. Much cleaner boundaries, though with residual
+            errors.
           </p>
           <p>
-            <strong>3 · YOLO26-seg (elección final).</strong> Fine-tuning del
-            modelo de segmentación de instancias de Ultralytics sobre VizWiz
-            (una sola clase, <em>salient object</em>). Máscaras más limpias y
-            robustas en nuestras imágenes objetivo.
+            <strong>3 · YOLO26-seg (final choice).</strong> Fine-tuning of
+            Ultralytics' instance-segmentation model on VizWiz (a single class,
+            <em>salient object</em>). Cleaner, more robust masks on our target
+            images.
           </p>
           <p class="table-note" style="margin-top: 4px;">
-            Las tres se entrenan a 512×512 con la misma aumentación
-            (flips, rotaciones, brillo/contraste, blur y ruido) y con
-            seguimiento de métricas en <strong>Weights &amp; Biases</strong>,
-            para que la comparación sea justa.
+            All three are trained at 512×512 with the same augmentation
+            (flips, rotations, brightness/contrast, blur and noise) and with
+            metric tracking in <strong>Weights &amp; Biases</strong>, so the
+            comparison is fair.
           </p>
         </div>
 
         <div class="data-table-wrap">
           <table class="data-table">
             <thead>
-              <tr><th>Modelo</th><th>IoU</th><th>Dice</th><th>Precision</th><th>Recall</th></tr>
+              <tr><th>Model</th><th>IoU</th><th>Dice</th><th>Precision</th><th>Recall</th></tr>
             </thead>
             <tbody>
-              <tr><td>UNet (desde cero)</td><td>0.6201</td><td>0.7305</td><td>—</td><td>—</td></tr>
+              <tr><td>UNet (from scratch)</td><td>0.6201</td><td>0.7305</td><td>—</td><td>—</td></tr>
               <tr><td>U²-Net</td><td>0.7765</td><td>0.8397</td><td>0.8366</td><td>0.8987</td></tr>
               <tr class="is-highlight"><td>YOLO26-seg (fine-tuned)</td><td>0.8866</td><td>0.9206</td><td>0.9057</td><td>0.9584</td></tr>
             </tbody>
           </table>
         </div>
         <p class="table-note">
-          Métricas a nivel de píxel sobre el split de test oficial de VizWiz SOD.
-          YOLO26-seg gana en todas las métricas (+0.110 IoU sobre U²-Net). Ambos
-          modelos mantienen el recall por encima de la precisión: sobre-segmentan
-          ligeramente, el modo de fallo preferible para nuestro caso de uso.
+          Pixel-level metrics on the official VizWiz SOD test split. YOLO26-seg
+          wins on every metric (+0.110 IoU over U²-Net). Both models keep recall
+          above precision: they slightly over-segment — the preferable failure
+          mode for our use case.
         </p>
 
         <div class="mask-compare">
           <figure class="mask-row">
-            <span class="mask-row__label">Fotos originales</span>
+            <span class="mask-row__label">Original photos</span>
             <img
               class="media-frame"
               src="assets/img/image_to_mask.png"
-              alt="Tres fotos originales: un ratón sobre el suelo, tres azulejos sobre una mesa y un gato"
+              alt="Three original photos: a mouse on the floor, three tiles on a table, and a cat"
               loading="lazy"
             />
           </figure>
           <figure class="mask-row">
-            <span class="mask-row__label mask-row__label--u2">Máscaras · U²-Net</span>
+            <span class="mask-row__label mask-row__label--u2">Masks · U²-Net</span>
             <img
               class="media-frame"
               src="assets/img/masks_u2.png"
-              alt="Máscaras de U²-Net para los mismos tres objetos"
+              alt="U²-Net masks for the same three objects"
               loading="lazy"
             />
           </figure>
           <figure class="mask-row">
-            <span class="mask-row__label mask-row__label--yolo">Máscaras · YOLO26-seg</span>
+            <span class="mask-row__label mask-row__label--yolo">Masks · YOLO26-seg</span>
             <img
               class="media-frame"
               src="assets/img/masks_yolo.png"
-              alt="Máscaras de YOLO26-seg para los mismos tres objetos"
+              alt="YOLO26-seg masks for the same three objects"
               loading="lazy"
             />
           </figure>
         </div>
         <p class="table-note">
-          Los mismos tres objetos (ratón, azulejos y gato), segmentados por cada
-          modelo — las columnas están alineadas. Se aprecia el modo de fallo de
-          cada uno: <strong>U²-Net</strong> da máscaras más blandas y funde los
-          dos azulejos contiguos en una sola mancha; <strong>YOLO26-seg</strong>
-          separa cada azulejo como instancia y entrega bordes más nítidos. Ambos
-          motivan el refinado posterior.
+          The same three objects (mouse, tiles and cat), segmented by each model
+          — the columns are aligned. Each model's failure mode shows:
+          <strong>U²-Net</strong> gives softer masks and merges the two adjacent
+          tiles into a single blob; <strong>YOLO26-seg</strong> separates each
+          tile as an instance and delivers sharper edges. Both motivate the
+          refinement step.
         </p>
 
         <header class="section__header" style="margin-top: 64px;">
-          <h3 class="section__title" style="font-size: 1.5rem;">Refinado de máscaras</h3>
+          <h3 class="section__title" style="font-size: 1.5rem;">Mask refinement</h3>
           <p class="section__lead section__lead--center">
-            YOLO añade a veces detecciones secundarias espurias; U²-Net produce
-            bordes blandos con pequeños huecos. El refinado elimina ese ruido
-            antes de que la máscara filtre la nube de puntos.
+            YOLO occasionally adds spurious secondary detections; U²-Net produces
+            soft boundaries with small holes. Refinement removes that noise
+            before the mask filters the point cloud.
           </p>
         </header>
 
         <div class="data-table-wrap">
           <table class="data-table">
             <thead>
-              <tr><th>Enfoque</th><th>Qué hace</th><th>Resultado</th></tr>
+              <tr><th>Approach</th><th>What it does</th><th>Result</th></tr>
             </thead>
             <tbody>
               <tr>
                 <td>A — YOLO ∩ U²-Net (AND)</td>
-                <td>Intersección píxel a píxel de ambas máscaras</td>
-                <td>Elimina falsos positivos, pero erosiona bordes donde los modelos discrepan</td>
+                <td>Pixel-wise intersection of both masks</td>
+                <td>Removes false positives, but erodes edges where the models disagree</td>
               </tr>
               <tr>
-                <td>B — U²-Net + apertura</td>
-                <td>Máscara de saliencia + apertura morfológica</td>
-                <td>Silueta limpia, pero contornos menos precisos</td>
+                <td>B — U²-Net + opening</td>
+                <td>Saliency mask + morphological opening</td>
+                <td>Clean silhouette, but softer / less precise boundaries</td>
               </tr>
               <tr class="is-highlight">
-                <td>C — YOLO + apertura</td>
-                <td>Máscara de detección + apertura morfológica (kernel elíptico 21) + mayor componente conexa</td>
-                <td>Seleccionado — bordes nítidos, ruido residual eliminado, objeto intacto</td>
+                <td>C — YOLO + opening</td>
+                <td>Detection mask + morphological opening (elliptical kernel 21) + largest connected component</td>
+                <td>Selected — sharp boundaries, residual noise removed, object not eroded</td>
               </tr>
             </tbody>
           </table>
         </div>
         <p class="table-note">
-          La apertura morfológica (erosión + dilatación) elimina regiones
-          pequeñas y puentes finos; después, un etiquetado de componentes
-          conexas (conectividad-8) conserva solo la región de mayor área por
-          imagen: el objeto de interés.
+          Morphological opening (erosion + dilation) removes small regions and
+          thin bridges; then connected-component labeling (8-connectivity) keeps
+          only the largest region per image: the object of interest.
         </p>
 
         <div class="compare-grid compare-grid--4">
           <figure class="compare-cell">
-            <img class="media-frame" src="assets/img/img_base.jpeg" alt="Foto de entrada: un ventilador de torre en una habitación con suelo hidráulico" loading="lazy" />
-            <figcaption class="compare-cell__cap"><strong>Entrada</strong><br />Foto original</figcaption>
+            <img class="media-frame" src="assets/img/img_base.jpeg" alt="Input photo: a tower fan in a room with patterned tile floor" loading="lazy" />
+            <figcaption class="compare-cell__cap"><strong>Input</strong><br />Original photo</figcaption>
           </figure>
           <figure class="compare-cell">
-            <img class="media-frame" src="assets/img/mask_003_mix.png" alt="Máscara del enfoque A: intersección YOLO y U²-Net" loading="lazy" />
+            <img class="media-frame" src="assets/img/mask_003_mix.png" alt="Approach A mask: intersection of YOLO and U²-Net" loading="lazy" />
             <figcaption class="compare-cell__cap"><strong>A</strong><br />YOLO ∩ U²-Net</figcaption>
           </figure>
           <figure class="compare-cell">
-            <img class="media-frame" src="assets/img/mask_003_u2.png" alt="Máscara del enfoque B: U²-Net con apertura morfológica" loading="lazy" />
-            <figcaption class="compare-cell__cap"><strong>B</strong><br />U²-Net + apertura</figcaption>
+            <img class="media-frame" src="assets/img/mask_003_u2.png" alt="Approach B mask: U²-Net with morphological opening" loading="lazy" />
+            <figcaption class="compare-cell__cap"><strong>B</strong><br />U²-Net + opening</figcaption>
           </figure>
           <figure class="compare-cell compare-cell--pick">
-            <img class="media-frame" src="assets/img/mask_003_yolo.png" alt="Máscara del enfoque C, el elegido: YOLO con apertura morfológica" loading="lazy" />
-            <figcaption class="compare-cell__cap"><strong>C ✓</strong><br />YOLO + apertura</figcaption>
+            <img class="media-frame" src="assets/img/mask_003_yolo.png" alt="Approach C mask, the chosen one: YOLO with morphological opening" loading="lazy" />
+            <figcaption class="compare-cell__cap"><strong>C ✓</strong><br />YOLO + opening</figcaption>
           </figure>
         </div>
         <p class="table-note">
-          El mismo ventilador con los tres enfoques. El elegido es el
+          The same fan under the three approaches. The chosen one is
           <strong>C</strong> (<code>--seg-checkpoint &lt;yolo&gt;.pt --morph-open --keep-largest</code>):
-          bordes nítidos, ruido residual eliminado y el objeto sin erosionar.
+          sharp boundaries, residual noise removed and the object not eroded.
         </p>
       </div>
     </section>
 
-    <!-- ===================== RECONSTRUCCIÓN 3D ===================== -->
-    <section class="section" id="reconstruccion">
+    <!-- ===================== 3D RECONSTRUCTION ===================== -->
+    <section class="section" id="reconstruction">
       <div class="container">
         <header class="section__header">
-          <p class="section__eyebrow">Etapa 2</p>
-          <h2 class="section__title">Reconstrucción 3D con VGGT-Ω</h2>
+          <p class="section__eyebrow">Stage 2</p>
+          <h2 class="section__title">3D reconstruction with VGGT-Ω</h2>
           <p class="section__lead section__lead--center">
-            Para poses y geometría usamos
+            For poses and geometry we use
             <a href="https://vggt-omega.github.io" target="_blank" rel="noopener"><strong>VGGT-Ω</strong></a>
-            (CVPR 2026, VGG Oxford + Meta AI): un transformer <em>feed-forward</em>
-            que recupera cámaras y 3D denso en una sola pasada.
+            (CVPR 2026, VGG Oxford + Meta AI): a <em>feed-forward</em> transformer
+            that recovers cameras and dense 3D in a single pass.
           </p>
         </header>
 
         <div class="section__text" style="max-width: 820px; margin-inline: auto;">
           <p>
-            Lo elegimos frente a <strong>COLMAP</strong> porque el SfM
-            incremental es lento, frágil con capturas escasas o sin textura, y
-            falla a menudo con fotos casuales de móvil; VGGT-Ω se mantiene
-            robusto incluso con muy pocas vistas. A partir de la profundidad,
-            las intrínsecas y las extrínsecas de cada vista, los mapas se
-            desproyectan a una nube de puntos densa en coordenadas de mundo,
-            filtrada por confianza.
+            We chose it over <strong>COLMAP</strong> because incremental SfM is
+            slow, brittle on sparse or textureless captures, and often fails on
+            casual phone photos; VGGT-Ω stays robust even with very few views.
+            From each view's depth, intrinsics and extrinsics, the maps are
+            unprojected into a dense point cloud in world coordinates, filtered
+            by confidence.
           </p>
         </div>
 
         <div class="data-table-wrap">
           <table class="data-table">
             <thead>
-              <tr><th>#</th><th>Etapa</th><th>Entrada</th><th>Salida</th></tr>
+              <tr><th>#</th><th>Stage</th><th>Input</th><th>Output</th></tr>
             </thead>
             <tbody>
-              <tr><td>1</td><td>Tokenizador de imagen (DINOv3)</td><td>Imágenes RGB (N,3,H,W)</td><td>Tokens de parche por imagen</td></tr>
-              <tr><td>2</td><td>Agregador — atención alternada por vista y global</td><td>Tokens de parche + tokens de cámara/registro</td><td>Tokens con contexto compartido entre vistas</td></tr>
-              <tr><td>3</td><td>Cabeza de cámara</td><td>Tokens de cámara</td><td>Extrínsecas + intrínsecas por vista</td></tr>
-              <tr><td>4</td><td>Cabeza de profundidad</td><td>Features agregadas</td><td>Mapa de profundidad + confianza por vista</td></tr>
-              <tr><td>5</td><td>Desproyección (post-proceso)</td><td>Depth + intrínsecas + extrínsecas</td><td>Nube de puntos 3D filtrada por confianza</td></tr>
+              <tr><td>1</td><td>Image tokenizer (DINOv3)</td><td>RGB images (N,3,H,W)</td><td>Patch tokens per image</td></tr>
+              <tr><td>2</td><td>Aggregator — alternating frame-wise and global attention</td><td>Patch tokens + camera/register tokens</td><td>Tokens with context shared across views</td></tr>
+              <tr><td>3</td><td>Camera head</td><td>Camera tokens</td><td>Extrinsics + intrinsics per view</td></tr>
+              <tr><td>4</td><td>Depth head</td><td>Aggregated features</td><td>Depth map + confidence per view</td></tr>
+              <tr><td>5</td><td>Unprojection (post-processing)</td><td>Depth + intrinsics + extrinsics</td><td>Confidence-filtered 3D point cloud</td></tr>
             </tbody>
           </table>
         </div>
@@ -512,37 +506,37 @@
           <img
             class="media-frame"
             src="assets/img/vggto_arch.png"
-            alt="Arquitectura de VGGT-Ω: tokenizador, agregador con atención alternada y cabezas de cámara y profundidad"
+            alt="VGGT-Ω architecture: tokenizer, aggregator with alternating attention, and camera and depth heads"
             loading="lazy"
           />
           <figcaption class="media-caption">
-            Arquitectura de VGGT-Ω. La atención alternada (por vista ↔ global)
-            consigue una geometría única y consistente entre todas las vistas.
-            Requiere GPU CUDA.
+            VGGT-Ω architecture. The alternating attention (frame-wise ↔ global)
+            settles on a single, consistent geometry across all views.
+            Requires a CUDA GPU.
           </figcaption>
         </figure>
 
         <header class="section__header" style="margin-top: 64px;">
-          <h3 class="section__title" style="font-size: 1.5rem;">De la nube de puntos a la malla</h3>
+          <h3 class="section__title" style="font-size: 1.5rem;">From point cloud to mesh</h3>
         </header>
 
         <div class="data-table-wrap">
           <table class="data-table">
             <thead>
-              <tr><th>Método</th><th>Aprendizaje</th><th>Resultado</th></tr>
+              <tr><th>Method</th><th>Learning</th><th>Outcome</th></tr>
             </thead>
             <tbody>
               <tr>
                 <td>Poisson (Open3D)</td><td>No</td>
-                <td>Baseline — superficies sobre-suavizadas, membranas y picos con pocas vistas</td>
+                <td>Baseline — over-smoothed surfaces, membranes and spikes on few-view clouds</td>
               </tr>
               <tr>
-                <td>NKSR</td><td>Sí</td>
-                <td>No integrable a tiempo (wheels caducados, compilación CUDA desde fuente)</td>
+                <td>NKSR</td><td>Yes</td>
+                <td>Not integrable in time (expired wheels, source CUDA build)</td>
               </tr>
               <tr class="is-highlight">
                 <td>PyMeshLab (Screened Poisson)</td><td>No</td>
-                <td>Seleccionado — robusto, scriptable, instalación limpia; mallas watertight</td>
+                <td>Selected — robust, scriptable, clean install; watertight meshes</td>
               </tr>
             </tbody>
           </table>
@@ -554,15 +548,15 @@
     <section class="section section--alt" id="demo">
       <div class="container">
         <header class="section__header">
-          <p class="section__eyebrow">En acción</p>
+          <p class="section__eyebrow">In action</p>
           <h2 class="section__title">Demo</h2>
           <p class="section__lead section__lead--center">
-            Galería de ejemplos en bucle. Los assets reales se añadirán más adelante.
+            Looping example gallery. The real assets will be added later.
           </p>
         </header>
 
         <div class="gallery">
-          <!-- Vídeo demo 1. Sustituir por assets/video/demo-1.mp4 -->
+          <!-- Demo video 1. Replace with assets/video/demo-1.mp4 -->
           <figure class="gallery__item">
             <!--
             <video class="gallery__video" autoplay muted loop playsinline poster="assets/img/demo-1-poster.jpg">
@@ -570,12 +564,12 @@
             </video>
             -->
             <div class="media-placeholder media-placeholder--video">
-              <span class="media-placeholder__label">Vídeo demo (loop)</span>
+              <span class="media-placeholder__label">Demo video (loop)</span>
             </div>
-            <figcaption class="media-caption">Reconstrucción de un objeto cotidiano.</figcaption>
+            <figcaption class="media-caption">Reconstruction of an everyday object.</figcaption>
           </figure>
 
-          <!-- Vídeo demo 2. Sustituir por assets/video/demo-2.mp4 -->
+          <!-- Demo video 2. Replace with assets/video/demo-2.mp4 -->
           <figure class="gallery__item">
             <!--
             <video class="gallery__video" autoplay muted loop playsinline poster="assets/img/demo-2-poster.jpg">
@@ -583,141 +577,139 @@
             </video>
             -->
             <div class="media-placeholder media-placeholder--video">
-              <span class="media-placeholder__label">Vídeo demo (loop)</span>
+              <span class="media-placeholder__label">Demo video (loop)</span>
             </div>
-            <figcaption class="media-caption">Rotación 360° de la malla generada.</figcaption>
+            <figcaption class="media-caption">360° rotation of the generated mesh.</figcaption>
           </figure>
 
-          <!-- Imagen demo. Sustituir por assets/img/demo-3.jpg -->
+          <!-- Demo image. Replace with assets/img/demo-3.jpg -->
           <figure class="gallery__item">
             <div class="media-placeholder media-placeholder--image">
-              <span class="media-placeholder__label">Imagen</span>
+              <span class="media-placeholder__label">Image</span>
             </div>
-            <figcaption class="media-caption">Nube de puntos completa vs. solo el objeto.</figcaption>
+            <figcaption class="media-caption">Full point cloud vs. object only.</figcaption>
           </figure>
 
-          <!-- Imagen demo. Sustituir por assets/img/demo-4.jpg -->
+          <!-- Demo image. Replace with assets/img/demo-4.jpg -->
           <figure class="gallery__item">
             <div class="media-placeholder media-placeholder--image">
-              <span class="media-placeholder__label">Imagen</span>
+              <span class="media-placeholder__label">Image</span>
             </div>
-            <figcaption class="media-caption">Malla final importada en Blender.</figcaption>
+            <figcaption class="media-caption">Final mesh imported into Blender.</figcaption>
           </figure>
         </div>
       </div>
     </section>
 
-    <!-- ===================== SISTEMA END-TO-END ===================== -->
-    <section class="section" id="sistema">
+    <!-- ===================== END-TO-END SYSTEM ===================== -->
+    <section class="section" id="system">
       <div class="container">
         <header class="section__header">
-          <p class="section__eyebrow">Bajo el capó</p>
-          <h2 class="section__title">Sistema end-to-end</h2>
+          <p class="section__eyebrow">Under the hood</p>
+          <h2 class="section__title">End-to-end system</h2>
           <p class="section__lead section__lead--center">
-            Toda la pipeline se sirve como una API HTTP (FastAPI) consumida por
-            una aplicación móvil: el usuario fotografía el objeto y recibe el
-            modelo 3D reconstruido.
+            The whole pipeline is served as an HTTP API (FastAPI) consumed by a
+            mobile app: the user photographs the object and gets back the
+            reconstructed 3D model.
           </p>
         </header>
 
         <div class="section__text" style="max-width: 820px; margin-inline: auto;">
           <p>
-            La inferencia de VGGT-Ω y la segmentación se ejecutan
-            <strong>en paralelo</strong> sobre las mismas imágenes. El fondo se
-            conserva durante la reconstrucción (es contexto imprescindible para
-            estimar las poses) y el objeto se aísla <em>después</em>: la máscara
-            pone a cero la confianza de los píxeles de fondo, filtrando la nube
-            reconstruida antes del mallado. Las subidas se limitan a 32 imágenes
-            (25&nbsp;MB cada una) y la inferencia se serializa tras un lock: una
-            única GPU compartida.
+            VGGT-Ω inference and segmentation run <strong>in parallel</strong>
+            on the same images. The background is kept during reconstruction
+            (essential context for pose estimation) and the object is isolated
+            <em>afterwards</em>: the mask zeroes the confidence of background
+            pixels, filtering the reconstructed cloud before meshing. Uploads
+            are limited to 32 images (25&nbsp;MB each) and inference is
+            serialized behind a lock: a single shared GPU.
           </p>
         </div>
 
         <div class="data-table-wrap">
           <table class="data-table">
             <thead>
-              <tr><th>Método y ruta</th><th>Función</th></tr>
+              <tr><th>Method &amp; path</th><th>Purpose</th></tr>
             </thead>
             <tbody>
-              <tr><td>POST /api/v1/inference</td><td>Sube N imágenes y ejecuta la pipeline; devuelve metadatos del job + URLs de descarga</td></tr>
-              <tr><td>GET /api/v1/jobs/{job_id}/files/{path}</td><td>Descarga un artefacto (malla, nube de puntos, PNG de depth/máscara)</td></tr>
-              <tr><td>GET /api/v1/jobs/{job_id}/archive</td><td>Descarga todos los artefactos del job en un ZIP</td></tr>
-              <tr><td>GET /health</td><td>Estado del dispositivo, CUDA y checkpoints</td></tr>
-              <tr><td>GET /docs</td><td>Swagger UI interactivo</td></tr>
+              <tr><td>POST /api/v1/inference</td><td>Upload N images and run the pipeline; returns job metadata + download URLs</td></tr>
+              <tr><td>GET /api/v1/jobs/{job_id}/files/{path}</td><td>Download an artifact (mesh, point cloud, depth/mask PNG)</td></tr>
+              <tr><td>GET /api/v1/jobs/{job_id}/archive</td><td>Download all of a job's artifacts as a ZIP</td></tr>
+              <tr><td>GET /health</td><td>Device, CUDA and checkpoint status</td></tr>
+              <tr><td>GET /docs</td><td>Interactive Swagger UI</td></tr>
             </tbody>
           </table>
         </div>
         <p class="table-note">
-          Especificación completa en
+          Full spec in
           <a href="https://github.com/Final-Project-Snap-3D/SegmentationModel_PP_AI/blob/main/vggt_omega/api/API_SPEC.md" target="_blank" rel="noopener">API_SPEC.md</a>.
-          Configuración por variables de entorno (checkpoints, dispositivo,
-          directorio de salida).
+          Configuration via environment variables (checkpoints, device, output
+          directory).
         </p>
       </div>
     </section>
 
-    <!-- ===================== CONCLUSIONES / ROADMAP ===================== -->
-    <section class="section section--alt" id="roadmap">
+    <!-- ===================== CONCLUSIONS / ROADMAP ===================== -->
+    <section class="section section--alt" id="conclusions">
       <div class="container">
         <header class="section__header">
-          <p class="section__eyebrow">Balance</p>
-          <h2 class="section__title">Conclusiones y trabajo futuro</h2>
+          <p class="section__eyebrow">Takeaways</p>
+          <h2 class="section__title">Conclusions &amp; future work</h2>
           <p class="section__lead section__lead--center">
-            Los baselines simples se quedaron cortos — UNet desde cero y Poisson
-            puro rindieron poco, y NKSR no fue integrable. Cada callejón sin
-            salida afinó el diseño final.
+            Simple baselines fell short — UNet from scratch and plain Poisson
+            underperformed, and NKSR was not integrable. Each dead end sharpened
+            the final design.
           </p>
         </header>
 
         <ul class="roadmap">
           <li class="roadmap__item roadmap__item--done">
-            <span class="roadmap__badge">Hecho</span>
-            <h3 class="roadmap__title">Segmentación robusta</h3>
-            <p>YOLO26-seg fine-tuned en VizWiz + apertura morfológica + mayor componente conexa (enfoque C).</p>
+            <span class="roadmap__badge">Done</span>
+            <h3 class="roadmap__title">Robust segmentation</h3>
+            <p>YOLO26-seg fine-tuned on VizWiz + morphological opening + largest connected component (approach C).</p>
           </li>
           <li class="roadmap__item roadmap__item--done">
-            <span class="roadmap__badge">Hecho</span>
-            <h3 class="roadmap__title">Reconstrucción feed-forward</h3>
-            <p>VGGT-Ω recupera cámaras y nube densa en una sola pasada; filtrado del objeto vía confianza de profundidad.</p>
+            <span class="roadmap__badge">Done</span>
+            <h3 class="roadmap__title">Feed-forward reconstruction</h3>
+            <p>VGGT-Ω recovers cameras and a dense cloud in a single pass; the object is filtered via depth confidence.</p>
           </li>
           <li class="roadmap__item roadmap__item--done">
-            <span class="roadmap__badge">Hecho</span>
-            <h3 class="roadmap__title">Mallado reproducible</h3>
-            <p>PyMeshLab (Screened Poisson) produce mallas watertight .obj/.ply/.stl listas para Blender e impresión.</p>
+            <span class="roadmap__badge">Done</span>
+            <h3 class="roadmap__title">Reproducible meshing</h3>
+            <p>PyMeshLab (Screened Poisson) produces watertight .obj/.ply/.stl meshes ready for Blender and printing.</p>
           </li>
           <li class="roadmap__item roadmap__item--done">
-            <span class="roadmap__badge">Hecho</span>
-            <h3 class="roadmap__title">API + app móvil</h3>
-            <p>Servicio FastAPI multipart consumido por el cliente móvil; toda la inferencia pesada queda en el servidor GPU.</p>
+            <span class="roadmap__badge">Done</span>
+            <h3 class="roadmap__title">API + mobile app</h3>
+            <p>Multipart FastAPI service consumed by the mobile client; all heavy inference stays on the GPU server.</p>
           </li>
           <li class="roadmap__item">
-            <span class="roadmap__badge">Futuro</span>
-            <h3 class="roadmap__title">Mallado aprendido</h3>
-            <p>Reevaluar métodos como NKSR cuando el tooling madure (wheels y builds estables).</p>
+            <span class="roadmap__badge">Future</span>
+            <h3 class="roadmap__title">Learned meshing</h3>
+            <p>Revisit methods like NKSR once the tooling matures (stable wheels and builds).</p>
           </li>
           <li class="roadmap__item">
-            <span class="roadmap__badge">Futuro</span>
-            <h3 class="roadmap__title">Fusión máscara–nube más estrecha</h3>
-            <p>Evaluar el filtrado dentro del bucle de inferencia frente al filtrado post-inferencia actual.</p>
+            <span class="roadmap__badge">Future</span>
+            <h3 class="roadmap__title">Tighter mask–cloud fusion</h3>
+            <p>Evaluate in-loop filtering during inference vs. the current post-inference filtering.</p>
           </li>
           <li class="roadmap__item">
-            <span class="roadmap__badge">Futuro</span>
-            <h3 class="roadmap__title">Escala métrica</h3>
-            <p>Calibración para obtener dimensiones exactas, imprescindible en impresión 3D de precisión.</p>
+            <span class="roadmap__badge">Future</span>
+            <h3 class="roadmap__title">Metric scale</h3>
+            <p>Calibration for accurate dimensions, essential for precision 3D printing.</p>
           </li>
           <li class="roadmap__item">
-            <span class="roadmap__badge">Futuro</span>
-            <h3 class="roadmap__title">Latencia interactiva</h3>
-            <p>Optimización hacia una captura guiada e interactiva en el propio dispositivo.</p>
+            <span class="roadmap__badge">Future</span>
+            <h3 class="roadmap__title">Interactive latency</h3>
+            <p>Optimization toward guided, interactive on-device capture.</p>
           </li>
         </ul>
 
         <p class="table-note" style="max-width: 820px; margin: 28px auto 0;">
-          <strong>Limitaciones conocidas:</strong> la calidad depende de la
-          cobertura de vistas y la textura del objeto (pocas vistas dejan huecos
-          en caras no observadas); las superficies finas o reflectantes siguen
-          siendo difíciles; y la segmentación se limita al objeto saliente, por
-          lo que escenas muy desordenadas pueden confundirla.
+          <strong>Known limitations:</strong> quality depends on view coverage
+          and object texture (few views leave holes on unseen faces); thin or
+          reflective surfaces remain challenging; and segmentation is limited to
+          the salient object, so heavily cluttered scenes can confuse it.
         </p>
       </div>
     </section>
@@ -728,9 +720,9 @@
     <div class="container footer__grid">
       <div class="footer__brand">
         <span class="brand__name">Snap<span class="brand__accent">to</span>3D</span>
-        <p class="footer__tagline">De la imagen al modelo tridimensional.</p>
+        <p class="footer__tagline">From the image to the three-dimensional model.</p>
 
-        <!-- Bloque institucional. El logo se oculta automáticamente si aún no existe el archivo. -->
+        <!-- Institutional block. The logo hides automatically if the file doesn't exist yet. -->
         <div class="footer__institution">
           <img
             src="assets/img/logoUPC.png"
@@ -739,44 +731,44 @@
             onerror="this.style.display='none'"
           />
           <p class="footer__institution-text">
-            Proyecto final del posgrado en Artificial Intelligence with Deep
-            Learning, UPC School.<br />
+            Final project of the postgraduate in Artificial Intelligence with
+            Deep Learning, UPC School.<br />
             Maria Bertolín · Marc Borràs · Marc Castellana · Gerard Rosell —
-            Tutor: Pablo Vega.
+            Advisor: Pablo Vega.
           </p>
         </div>
       </div>
 
-      <nav class="footer__links" aria-label="Enlaces del pie">
-        <h4 class="footer__heading">Proyecto</h4>
+      <nav class="footer__links" aria-label="Project links">
+        <h4 class="footer__heading">Project</h4>
         <ul>
-          <li><a href="#que-es">¿Qué es?</a></li>
-          <li><a href="#como-funciona">Cómo funciona</a></li>
-          <li><a href="#segmentacion">Segmentación</a></li>
-          <li><a href="#reconstruccion">Reconstrucción 3D</a></li>
-          <li><a href="#roadmap">Conclusiones</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#how-it-works">How it works</a></li>
+          <li><a href="#segmentation">Segmentation</a></li>
+          <li><a href="#reconstruction">3D Reconstruction</a></li>
+          <li><a href="#conclusions">Conclusions</a></li>
         </ul>
       </nav>
 
-      <nav class="footer__links" aria-label="Enlaces externos">
-        <h4 class="footer__heading">Enlaces</h4>
+      <nav class="footer__links" aria-label="External links">
+        <h4 class="footer__heading">Links</h4>
         <ul>
-          <li><a href="https://github.com/Final-Project-Snap-3D/SegmentationModel_PP_AI" target="_blank" rel="noopener">Repositorio</a></li>
-          <li><a href="https://github.com/Final-Project-Snap-3D" target="_blank" rel="noopener">Organización GitHub</a></li>
-          <li><a href="https://github.com/Final-Project-Snap-3D/SegmentationModel_PP_AI/blob/main/vggt_omega/api/API_SPEC.md" target="_blank" rel="noopener">Especificación de la API</a></li>
-          <li><a href="https://vizwiz.org/tasks-and-datasets/salient-object-detection/" target="_blank" rel="noopener">Dataset VizWiz</a></li>
+          <li><a href="https://github.com/Final-Project-Snap-3D/SegmentationModel_PP_AI" target="_blank" rel="noopener">Repository</a></li>
+          <li><a href="https://github.com/Final-Project-Snap-3D" target="_blank" rel="noopener">GitHub organization</a></li>
+          <li><a href="https://github.com/Final-Project-Snap-3D/SegmentationModel_PP_AI/blob/main/vggt_omega/api/API_SPEC.md" target="_blank" rel="noopener">API specification</a></li>
+          <li><a href="https://vizwiz.org/tasks-and-datasets/salient-object-detection/" target="_blank" rel="noopener">VizWiz dataset</a></li>
           <li><a href="https://vggt-omega.github.io" target="_blank" rel="noopener">VGGT-Ω</a></li>
         </ul>
       </nav>
     </div>
 
     <div class="footer__bottom container">
-      <p>&copy; <span id="year">2026</span> Snap to 3D. Documentación del proyecto.</p>
-      <a href="#top" class="footer__totop">Volver arriba ↑</a>
+      <p>&copy; <span id="year">2026</span> Snap to 3D. Project documentation.</p>
+      <a href="#top" class="footer__totop">Back to top ↑</a>
     </div>
   </footer>
 
-  <!-- Script principal -->
+  <!-- Main script -->
   <script src="main.js"></script>
 </body>
 </html>

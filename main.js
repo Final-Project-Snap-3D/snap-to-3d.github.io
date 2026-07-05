@@ -50,16 +50,16 @@
     const closeMenu = () => {
       menu.classList.remove("is-open");
       toggle.setAttribute("aria-expanded", "false");
-      toggle.setAttribute("aria-label", "Abrir menú");
+      toggle.setAttribute("aria-label", "Open menu");
     };
 
     toggle.addEventListener("click", () => {
       const isOpen = menu.classList.toggle("is-open");
       toggle.setAttribute("aria-expanded", String(isOpen));
-      toggle.setAttribute("aria-label", isOpen ? "Cerrar menú" : "Abrir menú");
+      toggle.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
     });
 
-    // Cierra el menú al pulsar un enlace (útil en móvil)
+    // Close the menu when a link is clicked (useful on mobile)
     menu.addEventListener("click", (event) => {
       if (event.target instanceof HTMLAnchorElement) {
         closeMenu();
