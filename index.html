@@ -6,7 +6,7 @@
   <title>Snap to 3D — De la foto al modelo 3D</title>
   <meta
     name="description"
-    content="Snap to 3D convierte fotos y capturas en modelos 3D listos para usar. Documentación técnica del proyecto."
+    content="Snap to 3D convierte unas pocas fotos de móvil en una malla 3D editable e imprimible, combinando segmentación (YOLO26) y reconstrucción feed-forward (VGGT-Ω). Documentación técnica del proyecto."
   />
 
   <!-- Stylesheet principal del proyecto -->
@@ -41,10 +41,19 @@
       <ul class="nav__menu" id="navMenu">
         <li><a href="#que-es">¿Qué es?</a></li>
         <li><a href="#como-funciona">Cómo funciona</a></li>
-        <li><a href="#demo">Demo</a></li>
-        <li><a href="#arquitectura">Arquitectura</a></li>
-        <li><a href="#roadmap">Roadmap</a></li>
-        <li><a class="nav__cta" href="#demo">Ver demostración</a></li>
+        <li><a href="#dataset">Dataset</a></li>
+        <li><a href="#segmentacion">Segmentación</a></li>
+        <li><a href="#reconstruccion">Reconstrucción 3D</a></li>
+        <li><a href="#sistema">Sistema</a></li>
+        <li><a href="#roadmap">Conclusiones</a></li>
+        <li>
+          <a
+            class="nav__cta"
+            href="https://github.com/Final-Project-Snap-3D"
+            target="_blank"
+            rel="noopener"
+          >GitHub</a>
+        </li>
       </ul>
 
       <div class="nav__controls">
@@ -99,16 +108,28 @@
       </div>
 
       <div class="hero__overlay container">
-        <p class="hero__eyebrow">Proyecto académico · Universitat Politècnica de Catalunya</p>
+        <p class="hero__eyebrow">
+          Proyecto final · Posgrado en Artificial Intelligence with Deep Learning · UPC School (2026)
+        </p>
         <h1 class="hero__title">Snap to 3D</h1>
         <p class="hero__subtitle">
-          Sistema para la reconstrucción de modelos tridimensionales a partir
-          de imágenes bidimensionales, mediante técnicas de visión por
-          computador y aprendizaje automático. Documentación técnica del proyecto.
+          De unas pocas fotos de móvil a una malla 3D editable e imprimible
+          (<code>.obj</code> / <code>.ply</code> / <code>.stl</code>), lista para Blender.
+          Sin escáner, sin plataforma giratoria, sin calibración: solo unas
+          cuantas fotos del objeto desde distintos ángulos.
+        </p>
+        <p class="hero__meta">
+          <strong>Autores:</strong> Maria Bertolín · Marc Borràs · Marc Castellana · Gerard Rosell
+          &nbsp;·&nbsp; <strong>Tutor:</strong> Pablo Vega
         </p>
         <div class="hero__actions">
-          <a class="btn btn--primary" href="#demo">Ver demostración</a>
-          <a class="btn btn--ghost" href="#que-es">Más información</a>
+          <a
+            class="btn btn--primary"
+            href="https://github.com/Final-Project-Snap-3D/SegmentationModel_PP_AI"
+            target="_blank"
+            rel="noopener"
+          >Ver el código en GitHub</a>
+          <a class="btn btn--ghost" href="#como-funciona">Cómo funciona</a>
         </div>
       </div>
 
@@ -124,33 +145,32 @@
           <p class="section__eyebrow">Visión general</p>
           <h2 class="section__title">¿Qué es Snap to 3D?</h2>
           <p class="section__lead">
-            Snap to 3D es un proyecto de investigación aplicada cuyo objetivo es
-            transformar imágenes bidimensionales en representaciones
-            tridimensionales, empleando técnicas de visión por computador y
-            aprendizaje automático.
+            Snap-to-3D es una pipeline de extremo a extremo que convierte un
+            puñado de fotos casuales de móvil de un objeto real en una malla 3D
+            editable e imprimible, combinando visión por computador clásica y
+            aprendizaje profundo.
           </p>
           <p>
-            <!-- TODO: Reemplazar por la descripción definitiva del proyecto -->
-            Contenido provisional. El proyecto busca facilitar la generación de
-            contenido 3D a partir de una única fotografía, obteniendo un activo
-            digital reutilizable en ámbitos como los videojuegos, el comercio
-            electrónico, la realidad aumentada o la fabricación aditiva, sin
-            requerir conocimientos previos de modelado.
+            El objetivo es hacer accesible la creación de activos 3D a
+            cualquiera que tenga un teléfono. Aplicaciones concretas:
           </p>
           <ul class="feature-list">
-            <li>No requiere software especializado ni formación previa.</li>
-            <li>Exportación a formatos estándar de la industria (glTF, OBJ, STL).</li>
-            <li>Concebido para integrarse en flujos de trabajo existentes.</li>
+            <li><strong>E-commerce</strong> — vistas 3D de producto a partir de una sesión rápida de fotos.</li>
+            <li><strong>Gemelos digitales</strong> — captura de activos físicos para simulación o inventario.</li>
+            <li><strong>Patrimonio cultural</strong> — digitalización de objetos para su preservación y estudio.</li>
+            <li><strong>Impresión 3D</strong> — mallas <em>watertight</em> listas para laminar e imprimir.</li>
           </ul>
         </div>
 
-        <!-- Imagen ilustrativa. Sustituir por assets/img/overview.jpg -->
         <figure class="section__media">
-          <div class="media-placeholder media-placeholder--image media-placeholder--tall">
-            <span class="media-placeholder__label">Imagen ilustrativa</span>
-          </div>
+          <img
+            class="media-frame"
+            src="assets/img/image_to_mask.png"
+            alt="Ejemplos de fotos de entrada y sus máscaras de segmentación del objeto"
+            loading="lazy"
+          />
           <figcaption class="media-caption">
-            Ejemplo de transformación de foto a malla 3D.
+            De la foto a la máscara binaria del objeto de interés.
           </figcaption>
         </figure>
       </div>
@@ -163,8 +183,9 @@
           <p class="section__eyebrow">El proceso</p>
           <h2 class="section__title">Cómo funciona</h2>
           <p class="section__lead section__lead--center">
-            El proceso se estructura en tres etapas, desde la imagen de entrada
-            hasta el modelo tridimensional.
+            Las imágenes de entrada siguen dos ramas en paralelo — segmentación
+            y reconstrucción — que se fusionan para aislar el objeto antes del
+            mallado final.
           </p>
         </header>
 
@@ -179,8 +200,9 @@
             <span class="step__number">01</span>
             <h3 class="step__title">Captura</h3>
             <p class="step__text">
-              Se proporciona una fotografía o captura del objeto. No se requiere
-              equipo profesional: es suficiente con la cámara de un dispositivo móvil.
+              N fotos del objeto desde distintos ángulos con el móvil (JPG, PNG
+              y HEIC/HEIF). El fondo se conserva: aporta el contexto geométrico
+              que la reconstrucción necesita para estimar las cámaras.
             </p>
           </li>
 
@@ -193,10 +215,12 @@
               </svg>
             </div>
             <span class="step__number">02</span>
-            <h3 class="step__title">Procesado</h3>
+            <h3 class="step__title">Segmentación + Reconstrucción</h3>
             <p class="step__text">
-              El sistema analiza la imagen, estima la geometría y genera la malla
-              junto con sus texturas de forma automática.
+              En paralelo: <strong>YOLO26-seg</strong> genera la máscara binaria
+              del objeto y <strong>VGGT-Ω</strong> recupera poses de cámara,
+              mapas de profundidad y una nube de puntos densa. La máscara anula
+              la confianza de los píxeles de fondo y filtra la nube.
             </p>
           </li>
 
@@ -209,18 +233,278 @@
               </svg>
             </div>
             <span class="step__number">03</span>
-            <h3 class="step__title">Modelo 3D</h3>
+            <h3 class="step__title">Malla 3D</h3>
             <p class="step__text">
-              El resultado se exporta en el formato deseado, listo para su uso en
-              motores gráficos, visores o sistemas de impresión 3D.
+              <strong>PyMeshLab</strong> (Screened Poisson) convierte la nube
+              filtrada en una malla <em>watertight</em> exportada como
+              .obj / .ply / .stl, lista para Blender, motores gráficos o
+              impresión 3D.
             </p>
           </li>
         </ol>
+
+        <figure class="section__media section__media--wide" style="margin-top: 48px;">
+          <img
+            class="media-frame"
+            src="assets/img/pipeline.png"
+            alt="Diagrama de la pipeline: fotos de entrada, ramas de segmentación y VGGT-Ω, filtrado por máscara y mallado"
+            loading="lazy"
+          />
+          <figcaption class="media-caption">
+            Vista general de la pipeline: segmentación y VGGT-Ω en paralelo,
+            filtrado por máscara y mallado con PyMeshLab.
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ===================== DATASET ===================== -->
+    <section class="section" id="dataset">
+      <div class="container">
+        <header class="section__header">
+          <p class="section__eyebrow">Los datos</p>
+          <h2 class="section__title">Dataset: VizWiz</h2>
+          <p class="section__lead section__lead--center">
+            La etapa de segmentación se entrena con
+            <a href="https://vizwiz.org/tasks-and-datasets/salient-object-detection/" target="_blank" rel="noopener"><strong>VizWiz Salient Object Detection</strong></a>,
+            un dataset de fotos tomadas por personas ciegas o con baja visión.
+          </p>
+        </header>
+
+        <div class="section__grid">
+          <div class="section__text">
+            <p>
+              Son capturas móviles del mundo real — con ruido, iluminación
+              diversa, fondos desordenados, desenfoque de movimiento y encuadres
+              descentrados — condiciones mucho más parecidas a las que nuestra
+              pipeline debe afrontar que las de un dataset de estudio.
+            </p>
+            <p>
+              Las anotaciones son polígonos del objeto saliente (un JSON por
+              split) que rasterizamos a máscaras binarias con
+              <code>cv2.fillPoly</code>. Usamos directamente los splits
+              oficiales del challenge VizWiz SOD, sin re-particionar.
+            </p>
+          </div>
+
+          <div>
+            <div class="data-table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr><th>Split</th><th>Imágenes</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Train</td><td>19 116</td></tr>
+                  <tr><td>Val</td><td>6 105</td></tr>
+                  <tr><td>Test</td><td>6 779</td></tr>
+                  <tr class="is-highlight"><td>Total</td><td>32 000</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SEGMENTACIÓN ===================== -->
+    <section class="section section--alt" id="segmentacion">
+      <div class="container">
+        <header class="section__header">
+          <p class="section__eyebrow">Etapa 1</p>
+          <h2 class="section__title">Segmentación del objeto</h2>
+          <p class="section__lead section__lead--center">
+            Iteramos tres arquitecturas hasta dar con la combinación adecuada
+            de calidad de máscara y robustez.
+          </p>
+        </header>
+
+        <div class="section__text" style="max-width: 820px; margin-inline: auto;">
+          <p>
+            <strong>1 · UNet desde cero.</strong> Entrenada en VizWiz con loss
+            BCE + Dice (0.3 / 0.7), AdamW y aumentación con Albumentations a
+            512×512. Los resultados no fueron satisfactorios: máscaras
+            imprecisas e inestables.
+          </p>
+          <p>
+            <strong>2 · U²-Net.</strong> Los bloques RSU anidados con supervisión
+            profunda supusieron una mejora drástica: contornos mucho más
+            limpios, aunque con errores residuales.
+          </p>
+          <p>
+            <strong>3 · YOLO26-seg (elección final).</strong> Fine-tuning del
+            modelo de segmentación de instancias de Ultralytics sobre VizWiz
+            (una sola clase, <em>salient object</em>). Máscaras más limpias y
+            robustas en nuestras imágenes objetivo.
+          </p>
+        </div>
+
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>Modelo</th><th>IoU</th><th>Dice</th><th>Precision</th><th>Recall</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>UNet (desde cero)</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>U²-Net</td><td>0.7765</td><td>0.8397</td><td>0.8366</td><td>0.8987</td></tr>
+              <tr class="is-highlight"><td>YOLO26-seg (fine-tuned)</td><td>0.8866</td><td>0.9206</td><td>0.9057</td><td>0.9584</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="table-note">
+          Métricas a nivel de píxel sobre el split de test oficial de VizWiz SOD.
+          YOLO26-seg gana en todas las métricas (+0.110 IoU sobre U²-Net). Ambos
+          modelos mantienen el recall por encima de la precisión: sobre-segmentan
+          ligeramente, el modo de fallo preferible para nuestro caso de uso.
+        </p>
+
+        <div class="gallery" style="margin-top: 40px;">
+          <figure class="gallery__item">
+            <img
+              class="media-frame"
+              src="assets/img/masks_u2.png"
+              alt="Máscaras generadas por U²-Net"
+              loading="lazy"
+            />
+            <figcaption class="media-caption">Máscaras con U²-Net.</figcaption>
+          </figure>
+          <figure class="gallery__item">
+            <img
+              class="media-frame"
+              src="assets/img/masks_yolo.png"
+              alt="Máscaras generadas por YOLO26-seg"
+              loading="lazy"
+            />
+            <figcaption class="media-caption">Máscaras con YOLO26-seg.</figcaption>
+          </figure>
+        </div>
+
+        <header class="section__header" style="margin-top: 64px;">
+          <h3 class="section__title" style="font-size: 1.5rem;">Refinado de máscaras</h3>
+          <p class="section__lead section__lead--center">
+            YOLO añade a veces detecciones secundarias espurias; U²-Net produce
+            bordes blandos con pequeños huecos. El refinado elimina ese ruido
+            antes de que la máscara filtre la nube de puntos.
+          </p>
+        </header>
+
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>Enfoque</th><th>Qué hace</th><th>Resultado</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>A — YOLO ∩ U²-Net (AND)</td>
+                <td>Intersección píxel a píxel de ambas máscaras</td>
+                <td>Elimina falsos positivos, pero erosiona bordes donde los modelos discrepan</td>
+              </tr>
+              <tr>
+                <td>B — U²-Net + apertura</td>
+                <td>Máscara de saliencia + apertura morfológica</td>
+                <td>Silueta limpia, pero contornos menos precisos</td>
+              </tr>
+              <tr class="is-highlight">
+                <td>C — YOLO + apertura</td>
+                <td>Máscara de detección + apertura morfológica (kernel elíptico 21) + mayor componente conexa</td>
+                <td>Seleccionado — bordes nítidos, ruido residual eliminado, objeto intacto</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="table-note">
+          La apertura morfológica (erosión + dilatación) elimina regiones
+          pequeñas y puentes finos; después, un etiquetado de componentes
+          conexas (conectividad-8) conserva solo la región de mayor área por
+          imagen: el objeto de interés.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== RECONSTRUCCIÓN 3D ===================== -->
+    <section class="section" id="reconstruccion">
+      <div class="container">
+        <header class="section__header">
+          <p class="section__eyebrow">Etapa 2</p>
+          <h2 class="section__title">Reconstrucción 3D con VGGT-Ω</h2>
+          <p class="section__lead section__lead--center">
+            Para poses y geometría usamos
+            <a href="https://vggt-omega.github.io" target="_blank" rel="noopener"><strong>VGGT-Ω</strong></a>
+            (CVPR 2026, VGG Oxford + Meta AI): un transformer <em>feed-forward</em>
+            que recupera cámaras y 3D denso en una sola pasada.
+          </p>
+        </header>
+
+        <div class="section__text" style="max-width: 820px; margin-inline: auto;">
+          <p>
+            Lo elegimos frente a <strong>COLMAP</strong> porque el SfM
+            incremental es lento, frágil con capturas escasas o sin textura, y
+            falla a menudo con fotos casuales de móvil; VGGT-Ω se mantiene
+            robusto incluso con muy pocas vistas. A partir de la profundidad,
+            las intrínsecas y las extrínsecas de cada vista, los mapas se
+            desproyectan a una nube de puntos densa en coordenadas de mundo,
+            filtrada por confianza.
+          </p>
+        </div>
+
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>#</th><th>Etapa</th><th>Entrada</th><th>Salida</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>Tokenizador de imagen (DINOv3)</td><td>Imágenes RGB (N,3,H,W)</td><td>Tokens de parche por imagen</td></tr>
+              <tr><td>2</td><td>Agregador — atención alternada por vista y global</td><td>Tokens de parche + tokens de cámara/registro</td><td>Tokens con contexto compartido entre vistas</td></tr>
+              <tr><td>3</td><td>Cabeza de cámara</td><td>Tokens de cámara</td><td>Extrínsecas + intrínsecas por vista</td></tr>
+              <tr><td>4</td><td>Cabeza de profundidad</td><td>Features agregadas</td><td>Mapa de profundidad + confianza por vista</td></tr>
+              <tr><td>5</td><td>Desproyección (post-proceso)</td><td>Depth + intrínsecas + extrínsecas</td><td>Nube de puntos 3D filtrada por confianza</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <figure class="section__media section__media--wide" style="margin-top: 40px;">
+          <img
+            class="media-frame"
+            src="assets/img/vggto_arch.png"
+            alt="Arquitectura de VGGT-Ω: tokenizador, agregador con atención alternada y cabezas de cámara y profundidad"
+            loading="lazy"
+          />
+          <figcaption class="media-caption">
+            Arquitectura de VGGT-Ω. La atención alternada (por vista ↔ global)
+            consigue una geometría única y consistente entre todas las vistas.
+            Requiere GPU CUDA.
+          </figcaption>
+        </figure>
+
+        <header class="section__header" style="margin-top: 64px;">
+          <h3 class="section__title" style="font-size: 1.5rem;">De la nube de puntos a la malla</h3>
+        </header>
+
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>Método</th><th>Aprendizaje</th><th>Resultado</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Poisson (Open3D)</td><td>No</td>
+                <td>Baseline — superficies sobre-suavizadas, membranas y picos con pocas vistas</td>
+              </tr>
+              <tr>
+                <td>NKSR</td><td>Sí</td>
+                <td>No integrable a tiempo (wheels caducados, compilación CUDA desde fuente)</td>
+              </tr>
+              <tr class="is-highlight">
+                <td>PyMeshLab (Screened Poisson)</td><td>No</td>
+                <td>Seleccionado — robusto, scriptable, instalación limpia; mallas watertight</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
 
     <!-- ===================== DEMO ===================== -->
-    <section class="section" id="demo">
+    <section class="section section--alt" id="demo">
       <div class="container">
         <header class="section__header">
           <p class="section__eyebrow">En acción</p>
@@ -241,7 +525,7 @@
             <div class="media-placeholder media-placeholder--video">
               <span class="media-placeholder__label">Vídeo demo (loop)</span>
             </div>
-            <figcaption class="media-caption">Reconstrucción de una silla.</figcaption>
+            <figcaption class="media-caption">Reconstrucción de un objeto cotidiano.</figcaption>
           </figure>
 
           <!-- Vídeo demo 2. Sustituir por assets/video/demo-2.mp4 -->
@@ -254,7 +538,7 @@
             <div class="media-placeholder media-placeholder--video">
               <span class="media-placeholder__label">Vídeo demo (loop)</span>
             </div>
-            <figcaption class="media-caption">Rotación 360° de un objeto.</figcaption>
+            <figcaption class="media-caption">Rotación 360° de la malla generada.</figcaption>
           </figure>
 
           <!-- Imagen demo. Sustituir por assets/img/demo-3.jpg -->
@@ -262,7 +546,7 @@
             <div class="media-placeholder media-placeholder--image">
               <span class="media-placeholder__label">Imagen</span>
             </div>
-            <figcaption class="media-caption">Antes / después del procesado.</figcaption>
+            <figcaption class="media-caption">Nube de puntos completa vs. solo el objeto.</figcaption>
           </figure>
 
           <!-- Imagen demo. Sustituir por assets/img/demo-4.jpg -->
@@ -270,65 +554,124 @@
             <div class="media-placeholder media-placeholder--image">
               <span class="media-placeholder__label">Imagen</span>
             </div>
-            <figcaption class="media-caption">Malla con wireframe visible.</figcaption>
+            <figcaption class="media-caption">Malla final importada en Blender.</figcaption>
           </figure>
         </div>
       </div>
     </section>
 
-    <!-- ===================== ARQUITECTURA TÉCNICA ===================== -->
-    <section class="section section--alt" id="arquitectura">
+    <!-- ===================== SISTEMA END-TO-END ===================== -->
+    <section class="section" id="sistema">
       <div class="container">
         <header class="section__header">
           <p class="section__eyebrow">Bajo el capó</p>
-          <h2 class="section__title">Arquitectura técnica</h2>
+          <h2 class="section__title">Sistema end-to-end</h2>
           <p class="section__lead section__lead--center">
-            Visión de alto nivel de los componentes del sistema.
+            Toda la pipeline se sirve como una API HTTP (FastAPI) consumida por
+            una aplicación móvil: el usuario fotografía el objeto y recibe el
+            modelo 3D reconstruido.
           </p>
         </header>
 
-        <!-- Diagrama de arquitectura. Sustituir por assets/img/architecture.svg -->
-        <figure class="section__media section__media--wide">
-          <div class="media-placeholder media-placeholder--diagram">
-            <span class="media-placeholder__label">Diagrama de arquitectura</span>
-          </div>
-          <figcaption class="media-caption">
-            Flujo: cliente → API de ingesta → pipeline de procesado → almacenamiento de modelos.
-          </figcaption>
-        </figure>
+        <div class="section__text" style="max-width: 820px; margin-inline: auto;">
+          <p>
+            La inferencia de VGGT-Ω y la segmentación se ejecutan
+            <strong>en paralelo</strong> sobre las mismas imágenes. El fondo se
+            conserva durante la reconstrucción (es contexto imprescindible para
+            estimar las poses) y el objeto se aísla <em>después</em>: la máscara
+            pone a cero la confianza de los píxeles de fondo, filtrando la nube
+            reconstruida antes del mallado. Las subidas se limitan a 32 imágenes
+            (25&nbsp;MB cada una) y la inferencia se serializa tras un lock: una
+            única GPU compartida.
+          </p>
+        </div>
+
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>Método y ruta</th><th>Función</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>POST /api/v1/inference</td><td>Sube N imágenes y ejecuta la pipeline; devuelve metadatos del job + URLs de descarga</td></tr>
+              <tr><td>GET /api/v1/jobs/{job_id}/files/{path}</td><td>Descarga un artefacto (malla, nube de puntos, PNG de depth/máscara)</td></tr>
+              <tr><td>GET /api/v1/jobs/{job_id}/archive</td><td>Descarga todos los artefactos del job en un ZIP</td></tr>
+              <tr><td>GET /health</td><td>Estado del dispositivo, CUDA y checkpoints</td></tr>
+              <tr><td>GET /docs</td><td>Swagger UI interactivo</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="table-note">
+          Especificación completa en
+          <a href="https://github.com/Final-Project-Snap-3D/SegmentationModel_PP_AI/blob/main/vggt_omega/api/API_SPEC.md" target="_blank" rel="noopener">API_SPEC.md</a>.
+          Configuración por variables de entorno (checkpoints, dispositivo,
+          directorio de salida).
+        </p>
       </div>
     </section>
 
-    <!-- ===================== ROADMAP / ESTADO ===================== -->
-    <section class="section" id="roadmap">
+    <!-- ===================== CONCLUSIONES / ROADMAP ===================== -->
+    <section class="section section--alt" id="roadmap">
       <div class="container">
         <header class="section__header">
-          <p class="section__eyebrow">Hacia dónde vamos</p>
-          <h2 class="section__title">Roadmap y estado del proyecto</h2>
+          <p class="section__eyebrow">Balance</p>
+          <h2 class="section__title">Conclusiones y trabajo futuro</h2>
+          <p class="section__lead section__lead--center">
+            Los baselines simples se quedaron cortos — UNet desde cero y Poisson
+            puro rindieron poco, y NKSR no fue integrable. Cada callejón sin
+            salida afinó el diseño final.
+          </p>
         </header>
 
         <ul class="roadmap">
           <li class="roadmap__item roadmap__item--done">
             <span class="roadmap__badge">Hecho</span>
-            <h3 class="roadmap__title">Prueba de concepto</h3>
-            <p>Pipeline básico de imagen a malla validado con ejemplos internos.</p>
+            <h3 class="roadmap__title">Segmentación robusta</h3>
+            <p>YOLO26-seg fine-tuned en VizWiz + apertura morfológica + mayor componente conexa (enfoque C).</p>
           </li>
-          <li class="roadmap__item roadmap__item--progress">
-            <span class="roadmap__badge">En curso</span>
-            <h3 class="roadmap__title">Mejora de calidad</h3>
-            <p>Optimización de texturas y reducción de artefactos en la geometría.</p>
+          <li class="roadmap__item roadmap__item--done">
+            <span class="roadmap__badge">Hecho</span>
+            <h3 class="roadmap__title">Reconstrucción feed-forward</h3>
+            <p>VGGT-Ω recupera cámaras y nube densa en una sola pasada; filtrado del objeto vía confianza de profundidad.</p>
+          </li>
+          <li class="roadmap__item roadmap__item--done">
+            <span class="roadmap__badge">Hecho</span>
+            <h3 class="roadmap__title">Mallado reproducible</h3>
+            <p>PyMeshLab (Screened Poisson) produce mallas watertight .obj/.ply/.stl listas para Blender e impresión.</p>
+          </li>
+          <li class="roadmap__item roadmap__item--done">
+            <span class="roadmap__badge">Hecho</span>
+            <h3 class="roadmap__title">API + app móvil</h3>
+            <p>Servicio FastAPI multipart consumido por el cliente móvil; toda la inferencia pesada queda en el servidor GPU.</p>
           </li>
           <li class="roadmap__item">
-            <span class="roadmap__badge">Planificado</span>
-            <h3 class="roadmap__title">API pública</h3>
-            <p>Endpoints documentados para integrar el procesado en terceros.</p>
+            <span class="roadmap__badge">Futuro</span>
+            <h3 class="roadmap__title">Mallado aprendido</h3>
+            <p>Reevaluar métodos como NKSR cuando el tooling madure (wheels y builds estables).</p>
           </li>
           <li class="roadmap__item">
-            <span class="roadmap__badge">Planificado</span>
-            <h3 class="roadmap__title">Visor web interactivo</h3>
-            <p>Previsualización 3D en el navegador antes de descargar.</p>
+            <span class="roadmap__badge">Futuro</span>
+            <h3 class="roadmap__title">Fusión máscara–nube más estrecha</h3>
+            <p>Evaluar el filtrado dentro del bucle de inferencia frente al filtrado post-inferencia actual.</p>
+          </li>
+          <li class="roadmap__item">
+            <span class="roadmap__badge">Futuro</span>
+            <h3 class="roadmap__title">Escala métrica</h3>
+            <p>Calibración para obtener dimensiones exactas, imprescindible en impresión 3D de precisión.</p>
+          </li>
+          <li class="roadmap__item">
+            <span class="roadmap__badge">Futuro</span>
+            <h3 class="roadmap__title">Latencia interactiva</h3>
+            <p>Optimización hacia una captura guiada e interactiva en el propio dispositivo.</p>
           </li>
         </ul>
+
+        <p class="table-note" style="max-width: 820px; margin: 28px auto 0;">
+          <strong>Limitaciones conocidas:</strong> la calidad depende de la
+          cobertura de vistas y la textura del objeto (pocas vistas dejan huecos
+          en caras no observadas); las superficies finas o reflectantes siguen
+          siendo difíciles; y la segmentación se limita al objeto saliente, por
+          lo que escenas muy desordenadas pueden confundirla.
+        </p>
       </div>
     </section>
   </main>
@@ -349,8 +692,10 @@
             onerror="this.style.display='none'"
           />
           <p class="footer__institution-text">
-            Proyecto académico desarrollado en la<br />
-            Universitat Politècnica de Catalunya (UPC).
+            Proyecto final del posgrado en Artificial Intelligence with Deep
+            Learning, UPC School.<br />
+            Maria Bertolín · Marc Borràs · Marc Castellana · Gerard Rosell —
+            Tutor: Pablo Vega.
           </p>
         </div>
       </div>
@@ -360,17 +705,20 @@
         <ul>
           <li><a href="#que-es">¿Qué es?</a></li>
           <li><a href="#como-funciona">Cómo funciona</a></li>
-          <li><a href="#roadmap">Roadmap</a></li>
+          <li><a href="#segmentacion">Segmentación</a></li>
+          <li><a href="#reconstruccion">Reconstrucción 3D</a></li>
+          <li><a href="#roadmap">Conclusiones</a></li>
         </ul>
       </nav>
 
       <nav class="footer__links" aria-label="Enlaces externos">
         <h4 class="footer__heading">Enlaces</h4>
         <ul>
-          <!-- TODO: actualizar con las URLs reales -->
-          <li><a href="#" rel="noopener">Repositorio</a></li>
-          <li><a href="#" rel="noopener">Documentación</a></li>
-          <li><a href="#" rel="noopener">Contacto</a></li>
+          <li><a href="https://github.com/Final-Project-Snap-3D/SegmentationModel_PP_AI" target="_blank" rel="noopener">Repositorio</a></li>
+          <li><a href="https://github.com/Final-Project-Snap-3D" target="_blank" rel="noopener">Organización GitHub</a></li>
+          <li><a href="https://github.com/Final-Project-Snap-3D/SegmentationModel_PP_AI/blob/main/vggt_omega/api/API_SPEC.md" target="_blank" rel="noopener">Especificación de la API</a></li>
+          <li><a href="https://vizwiz.org/tasks-and-datasets/salient-object-detection/" target="_blank" rel="noopener">Dataset VizWiz</a></li>
+          <li><a href="https://vggt-omega.github.io" target="_blank" rel="noopener">VGGT-Ω</a></li>
         </ul>
       </nav>
     </div>

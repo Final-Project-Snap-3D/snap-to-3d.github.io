@@ -80,7 +80,7 @@
   ).matches;
 
   const revealTargets = document.querySelectorAll(
-    ".section__header, .section__text, .section__media, .step, .gallery__item, .roadmap__item"
+    ".section__header, .section__text, .section__media, .step, .gallery__item, .roadmap__item, .data-table-wrap"
   );
 
   if (reduceMotion || !("IntersectionObserver" in window)) {

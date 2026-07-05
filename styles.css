@@ -863,3 +863,84 @@ button:focus-visible {
     transition: none;
   }
 }
+
+/* =========================================================
+   TABLAS DE DATOS (métricas, endpoints, comparativas)
+   ========================================================= */
+.data-table-wrap {
+  overflow-x: auto;
+  margin-top: 28px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.93rem;
+  min-width: 560px;
+}
+
+.data-table th,
+.data-table td {
+  padding: 12px 18px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+}
+
+.data-table thead th {
+  background-color: var(--color-surface-2);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table td {
+  color: var(--color-text-muted);
+}
+
+.data-table td:first-child {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* Fila destacada (opción seleccionada / ganadora) */
+.data-table .is-highlight td {
+  background-color: var(--color-accent-soft);
+  color: var(--color-text);
+}
+
+.table-note {
+  margin-top: 10px;
+  font-size: 0.83rem;
+  color: var(--color-text-muted);
+}
+
+/* =========================================================
+   IMÁGENES REALES EN SECCIONES
+   ========================================================= */
+.media-frame {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow);
+  background-color: var(--color-surface);
+}
+
+/* Meta del hero (autores / tutor) */
+.hero__meta {
+  margin: 18px auto 0;
+  max-width: 660px;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
