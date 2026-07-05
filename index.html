@@ -44,12 +44,13 @@
         <li><a href="#dataset">Dataset</a></li>
         <li><a href="#segmentation">Segmentation</a></li>
         <li><a href="#reconstruction">3D Reconstruction</a></li>
+        <li><a href="#demo">Demo</a></li>
         <li><a href="#system">System</a></li>
         <li><a href="#conclusions">Conclusions</a></li>
         <li>
           <a
             class="nav__cta"
-            href="https://github.com/Final-Project-Snap-3D"
+            href="https://github.com/Final-Project-Snap-3D/SegmentationModel_PP_AI"
             target="_blank"
             rel="noopener"
           >GitHub</a>
@@ -87,26 +88,8 @@
   <main>
     <!-- ===================== HERO ===================== -->
     <section class="hero" id="hero">
-      <!-- Looping background video. When assets/video/hero.mp4 exists it will play;
-           until then the placeholder (.hero__media-fallback) stays visible below. -->
-      <div class="hero__media" aria-hidden="true">
-        <!--
-        <video
-          class="hero__video"
-          autoplay
-          muted
-          loop
-          playsinline
-          poster="assets/img/hero-poster.jpg"
-        >
-          <source src="assets/video/hero.mp4" type="video/mp4" />
-        </video>
-        -->
-        <div class="hero__media-fallback media-placeholder media-placeholder--video">
-          <span class="media-placeholder__label">Background video (loop)</span>
-        </div>
-      </div>
-
+      <!-- Decorative, theme-aware backdrop (subtle 3D grid + accent glow) is
+           drawn entirely in CSS on .hero / .hero::after — no external asset. -->
       <div class="hero__overlay container">
         <p class="hero__eyebrow">
           Final project · Postgraduate in Artificial Intelligence with Deep Learning · UPC School (2026)
@@ -346,7 +329,7 @@
               <tr><th>Model</th><th>IoU</th><th>Dice</th><th>Precision *</th><th>Recall *</th></tr>
             </thead>
             <tbody>
-              <tr><td>UNet (from scratch)</td><td>0.6201</td><td>0.7305</td><td>—</td><td>—</td></tr>
+              <tr><td>UNet (from scratch)</td><td>0.62011</td><td>0.73052</td><td>—</td><td>—</td></tr>
               <tr><td>U²-Net</td><td>0.7765</td><td>0.8397</td><td>0.8366</td><td>0.8987</td></tr>
               <tr class="is-highlight"><td>YOLO26-seg (fine-tuned)</td><td>0.8866</td><td>0.9206</td><td>0.9057</td><td>0.9584</td></tr>
             </tbody>
@@ -581,35 +564,86 @@
             <code>z = d</code>), then to a shared world frame with the camera
             pose. Doing this for every kept pixel of every view yields one fused,
             coloured point cloud of the object — the views overlap because
-            VGGT-Ω already solved for a single shared geometry. That cloud is
-            what goes to the mesher.
+            VGGT-Ω already solved for a single shared geometry. Kept to the top
+            confidence percentile and capped at <strong>≤300k points</strong>,
+            that cloud is what goes to the mesher.
           </p>
         </div>
 
         <header class="section__header" style="margin-top: 64px;">
           <h3 class="section__title" style="font-size: 1.5rem;">From point cloud to mesh</h3>
+          <p class="section__lead section__lead--center">
+            Every method fits an implicit surface to the points and their normals
+            and extracts it with Marching Cubes — what differs is how tightly that
+            surface is pinned to the actual points.
+          </p>
         </header>
+
+        <div class="section__text" style="max-width: 820px; margin-inline: auto;">
+          <p>
+            Plain <strong>Poisson</strong> follows only the normals, so on
+            few-view clouds the surface drifts off the data and either balloons
+            outward or tears holes. <strong>Screened Poisson</strong> adds a term
+            that also forces the surface through the points themselves, so it
+            stays glued to the object — no drift, no holes, sharper detail. We run
+            it with PyMeshLab (octree depth 9), keeping Open3D Poisson as a
+            fallback; <strong>NKSR</strong>'s learned neural kernel field was
+            promising but not integrable in time.
+          </p>
+        </div>
 
         <div class="data-table-wrap">
           <table class="data-table">
             <thead>
-              <tr><th>Method</th><th>Learning</th><th>Outcome</th></tr>
+              <tr><th>Method</th><th>Surface pinned to points</th><th>Outcome</th></tr>
             </thead>
             <tbody>
               <tr>
-                <td>Poisson (Open3D)</td><td>No</td>
-                <td>Baseline — over-smoothed surfaces, membranes and spikes on few-view clouds</td>
+                <td>Poisson (unscreened)</td><td>✗ (normals only)</td>
+                <td>Drifts off the points → balloons or holes on few-view clouds; kept as baseline / fallback</td>
               </tr>
               <tr>
-                <td>NKSR</td><td>Yes</td>
+                <td>NKSR</td><td>Learned kernels</td>
                 <td>Not integrable in time (expired wheels, source CUDA build)</td>
               </tr>
               <tr class="is-highlight">
-                <td>PyMeshLab (Screened Poisson)</td><td>No</td>
-                <td>Selected — robust, scriptable, clean install; watertight meshes</td>
+                <td>PyMeshLab (Screened Poisson)</td><td>✓</td>
+                <td>Selected — glued to the object, sharp, watertight; clean &amp; scriptable</td>
               </tr>
             </tbody>
           </table>
+        </div>
+        <p class="table-note">
+          The full conversion conditions the cloud (confidence filter, outlier
+          removal, PCA + MST normals), runs Screened Poisson (octree depth 9),
+          then trims low-density vertices and cleans up before exporting a
+          watertight, colored <code>.obj</code> / <code>.ply</code> mesh.
+        </p>
+
+        <div class="gallery" style="margin-top: 32px;">
+          <figure class="gallery__item">
+            <img
+              class="media-frame"
+              src="assets/video/points.gif"
+              alt="Animated turntable of the segmented VGGT-Ω point cloud of the object"
+              loading="lazy"
+            />
+            <figcaption class="media-caption">
+              Input — the segmented point cloud from VGGT-Ω.
+            </figcaption>
+          </figure>
+          <figure class="gallery__item">
+            <img
+              class="media-frame"
+              src="assets/video/mesh_render.gif"
+              alt="Animated turntable of the reconstructed mesh, comparing unscreened Poisson and Screened Poisson"
+              loading="lazy"
+            />
+            <figcaption class="media-caption">
+              Output — watertight, colored mesh. Green: unscreened Poisson ·
+              Blue: Screened Poisson.
+            </figcaption>
+          </figure>
         </div>
       </div>
     </section>
@@ -621,51 +655,83 @@
           <p class="section__eyebrow">In action</p>
           <h2 class="section__title">Demo</h2>
           <p class="section__lead section__lead--center">
-            Looping example gallery. The real assets will be added later.
+            The interactive VGGT-Ω viewer we used to inspect reconstructions, and
+            the full two-branch pipeline run end-to-end on one real object.
           </p>
         </header>
 
+        <div class="section__text" style="max-width: 820px; margin-inline: auto;">
+          <p>
+            The VGGT-Ω team hosts an interactive
+            <a href="https://huggingface.co/spaces/facebook/vggt-omega" target="_blank" rel="noopener">Gradio demo</a>
+            as a Hugging Face Space, which we used to inspect our reconstructions:
+            you upload a handful of images, it runs a <strong>single forward
+            pass</strong> on their GPU, and renders the result in the browser. The
+            viewer shows both the dense, colored <strong>point cloud</strong> and
+            the <strong>estimated cameras</strong> — one small frustum per input
+            photo, placed at the exact position and orientation VGGT-Ω predicted,
+            so you can trace the arc walked around the object. You can orbit, zoom
+            and pan, filter points by depth confidence, cap their number, and
+            toggle the cameras or background on/off.
+          </p>
+        </div>
+
+        <figure class="section__media section__media--wide" style="margin-top: 8px;">
+          <img
+            class="media-frame"
+            src="assets/video/demo_vggt.gif"
+            alt="Screen recording of the VGGT-Ω Gradio demo: a point cloud with camera frustums, orbiting in the browser"
+            loading="lazy"
+          />
+          <figcaption class="media-caption">
+            The VGGT-Ω Gradio demo (Hugging Face Space): dense point cloud plus one
+            camera frustum per input view, recovered in a single forward pass.
+          </figcaption>
+        </figure>
+
+        <header class="section__header" style="margin-top: 72px;">
+          <h3 class="section__title" style="font-size: 1.5rem;">The pipeline in action — one real object</h3>
+          <p class="section__lead section__lead--center">
+            Nine smartphone shots in, a watertight mesh out. Every frame below is
+            a genuine artifact of a single run (view <code>000</code> of the nine).
+          </p>
+        </header>
+
+        <div class="section__text" style="max-width: 820px; margin-inline: auto;">
+          <p>
+            The nine views fan out into two parallel branches — VGGT-Ω depth and
+            Approach-C segmentation. They converge when the clean object mask
+            zeroes the depth confidence everywhere off the object
+            (<code>C' = C · M</code>); unprojecting the surviving pixels across all
+            nine views yields one colored point cloud, which PyMeshLab turns into
+            the final Blender-ready mesh.
+          </p>
+        </div>
+
         <div class="gallery">
-          <!-- Demo video 1. Replace with assets/video/demo-1.mp4 -->
           <figure class="gallery__item">
-            <!--
-            <video class="gallery__video" autoplay muted loop playsinline poster="assets/img/demo-1-poster.jpg">
-              <source src="assets/video/demo-1.mp4" type="video/mp4" />
-            </video>
-            -->
-            <div class="media-placeholder media-placeholder--video">
-              <span class="media-placeholder__label">Demo video (loop)</span>
-            </div>
-            <figcaption class="media-caption">Reconstruction of an everyday object.</figcaption>
+            <img class="media-frame" src="assets/img/input_000.jpg" alt="One of the nine smartphone input photos of the object, background intact" loading="lazy" />
+            <figcaption class="media-caption">Input — 1 of 9 phone shots (1080×1920), background kept.</figcaption>
           </figure>
-
-          <!-- Demo video 2. Replace with assets/video/demo-2.mp4 -->
           <figure class="gallery__item">
-            <!--
-            <video class="gallery__video" autoplay muted loop playsinline poster="assets/img/demo-2-poster.jpg">
-              <source src="assets/video/demo-2.mp4" type="video/mp4" />
-            </video>
-            -->
-            <div class="media-placeholder media-placeholder--video">
-              <span class="media-placeholder__label">Demo video (loop)</span>
-            </div>
-            <figcaption class="media-caption">360° rotation of the generated mesh.</figcaption>
+            <img class="media-frame" src="assets/img/depth_000.png" alt="VGGT-Ω dense inverse-depth map for the view" loading="lazy" />
+            <figcaption class="media-caption">VGGT-Ω branch — dense inverse-depth map + per-pixel confidence.</figcaption>
           </figure>
-
-          <!-- Demo image. Replace with assets/img/demo-3.jpg -->
           <figure class="gallery__item">
-            <div class="media-placeholder media-placeholder--image">
-              <span class="media-placeholder__label">Image</span>
-            </div>
-            <figcaption class="media-caption">Full point cloud vs. object only.</figcaption>
+            <img class="media-frame" src="assets/img/mask_000_yolo_raw.png" alt="Raw YOLO26-seg mask with speckle noise" loading="lazy" />
+            <figcaption class="media-caption">Segmentation branch — raw YOLO26-seg mask (a few stray specks).</figcaption>
           </figure>
-
-          <!-- Demo image. Replace with assets/img/demo-4.jpg -->
           <figure class="gallery__item">
-            <div class="media-placeholder media-placeholder--image">
-              <span class="media-placeholder__label">Image</span>
-            </div>
-            <figcaption class="media-caption">Final mesh imported into Blender.</figcaption>
+            <img class="media-frame" src="assets/img/mask_000_clean.png" alt="Cleaned single-component object mask after opening and keep-largest" loading="lazy" />
+            <figcaption class="media-caption">Approach C — opening (kernel 21) → keep-largest → clean object mask.</figcaption>
+          </figure>
+          <figure class="gallery__item">
+            <img class="media-frame" src="assets/img/depth_masked_000.png" alt="Depth map masked down to the object only" loading="lazy" />
+            <figcaption class="media-caption">Mask filter — <code>C' = C · M</code> zeroes the confidence off the object.</figcaption>
+          </figure>
+          <figure class="gallery__item">
+            <img class="media-frame" src="assets/img/mesh_3d.png" alt="Final reconstructed 3D mesh of the object" loading="lazy" />
+            <figcaption class="media-caption">Output — watertight, colored, Blender-ready mesh.</figcaption>
           </figure>
         </div>
       </div>
@@ -690,9 +756,12 @@
             on the same images. The background is kept during reconstruction
             (essential context for pose estimation) and the object is isolated
             <em>afterwards</em>: the mask zeroes the confidence of background
-            pixels, filtering the reconstructed cloud before meshing. Uploads
-            are limited to 32 images (25&nbsp;MB each) and inference is
-            serialized behind a lock: a single shared GPU.
+            pixels, filtering the reconstructed cloud before meshing. The service
+            returns the object as a point cloud or a watertight mesh
+            (<code>.obj</code> / <code>.stl</code> / <code>.ply</code>). Uploads
+            are limited to 32 images (25&nbsp;MB each), inference is serialized
+            behind a lock (a single shared GPU), and the API responds with
+            <code>503</code> on CPU-only hosts — VGGT-Ω needs a CUDA GPU.
           </p>
         </div>
 
@@ -716,6 +785,129 @@
           Configuration via environment variables (checkpoints, device, output
           directory).
         </p>
+
+        <!-- Mobile application flow -->
+        <header class="section__header" style="margin-top: 72px;">
+          <h3 class="section__title" style="font-size: 1.5rem;">Mobile application</h3>
+          <p class="section__lead section__lead--center">
+            The API is consumed by a mobile client: the user photographs the
+            object from several angles and gets back the reconstructed 3D model
+            — all the heavy inference stays on the GPU server.
+          </p>
+        </header>
+
+        <div class="section__text" style="max-width: 820px; margin-inline: auto;">
+          <p>
+            The multipart service decouples the app from the GPU: the client only
+            uploads photos and receives a point cloud or a watertight mesh. The
+            mobile app is developed in a separate repository,
+            <a href="https://github.com/Final-Project-Snap-3D/FE_APP_PP_AI" target="_blank" rel="noopener">FE_APP_PP_AI</a>.
+            The same round trip — <em>frontend → backend → frontend</em>:
+          </p>
+        </div>
+
+        <div class="app-flow">
+          <figure class="app-shot">
+            <img
+              class="app-shot__frame"
+              src="assets/img/frontend_initial.png"
+              alt="Mobile app capture screen titled 3D Capture, with tips for photographing the object and a Start Capture button"
+              loading="lazy"
+            />
+            <figcaption class="app-shot__cap">
+              <span class="app-shot__step">1 · Capture</span>
+              <strong>Frontend.</strong> The user shoots N views of the object,
+              walking around it.
+            </figcaption>
+          </figure>
+          <figure class="app-shot">
+            <img
+              class="app-shot__frame"
+              src="assets/img/frontend_computing.png"
+              alt="Mobile app computing screen titled Detecting geometry, with a progress bar"
+              loading="lazy"
+            />
+            <figcaption class="app-shot__cap">
+              <span class="app-shot__step">2 · Compute</span>
+              <strong>Backend.</strong> Images are POSTed to
+              <code>/api/v1/inference</code>; the GPU server runs VGGT-Ω +
+              segmentation + meshing.
+            </figcaption>
+          </figure>
+          <figure class="app-shot">
+            <img
+              class="app-shot__frame"
+              src="assets/img/frontend_result.png"
+              alt="Mobile app result screen titled 3D Model Ready, showing the reconstructed mug mesh with a Download Archive button"
+              loading="lazy"
+            />
+            <figcaption class="app-shot__cap">
+              <span class="app-shot__step">3 · Result</span>
+              <strong>Frontend.</strong> The reconstructed 3D object is returned
+              to the app, ready to download.
+            </figcaption>
+          </figure>
+        </div>
+
+        <div style="text-align: center; margin-top: 36px;">
+          <a
+            class="btn btn--primary"
+            href="https://github.com/Final-Project-Snap-3D/FE_APP_PP_AI"
+            target="_blank"
+            rel="noopener"
+          >
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" style="margin-right: 9px;">
+              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.76-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+            </svg>
+            View the mobile app on GitHub
+          </a>
+        </div>
+
+        <!-- Key decisions at a glance (README §9) -->
+        <header class="section__header" style="margin-top: 72px;">
+          <h3 class="section__title" style="font-size: 1.5rem;">Key decisions at a glance</h3>
+          <p class="section__lead section__lead--center">
+            The choices that shaped the pipeline — and the reasoning behind each.
+          </p>
+        </header>
+
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>Decision</th><th>Rationale</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>YOLO26-seg as the final segmenter</td>
+                <td>Better mask quality and inference than our own UNet/U²-Net; U²-Net kept as an alternative and for the mixed AND mode.</td>
+              </tr>
+              <tr>
+                <td>Approach C — YOLO + opening + keep-largest</td>
+                <td>Sharp boundaries with residual noise removed and the object not eroded (vs. AND-erosion or soft U²-Net edges).</td>
+              </tr>
+              <tr>
+                <td>VGGT-Ω over COLMAP / SfM</td>
+                <td>Feed-forward single pass, robust on a few casual phone photos; no iterative matching or bundle adjustment.</td>
+              </tr>
+              <tr>
+                <td>Apply the mask through <code>depth_conf</code></td>
+                <td>Setting confidence to 0 on the background gives one filtering mechanism shared by mask, confidence and depth-edge filters; the mask travels inside the predictions.</td>
+              </tr>
+              <tr>
+                <td>Post-inference mask filtering, background kept for VGGT-Ω</td>
+                <td>The background is required context for pose estimation; the object is isolated only after reconstruction.</td>
+              </tr>
+              <tr>
+                <td>PyMeshLab (Screened Poisson) over Poisson / NKSR</td>
+                <td>Poisson artifacts on few-view clouds; NKSR not integrable (expired wheels, source build); PyMeshLab is clean and scriptable.</td>
+              </tr>
+              <tr>
+                <td>Multipart FastAPI service behind a single-GPU lock</td>
+                <td>Decouples the mobile app from the GPU server and serializes inference on shared hardware.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
 
@@ -752,6 +944,11 @@
             <span class="roadmap__badge">Done</span>
             <h3 class="roadmap__title">API + mobile app</h3>
             <p>Multipart FastAPI service consumed by the mobile client; all heavy inference stays on the GPU server.</p>
+          </li>
+          <li class="roadmap__item">
+            <span class="roadmap__badge">Future</span>
+            <h3 class="roadmap__title">Unified segmentation metrics</h3>
+            <p>Evaluate every model at a matched operating point (precision–recall curves / threshold sweep, consistent instance-mask merging) so Precision and Recall are directly comparable across UNet, U²-Net and YOLO — and log the missing UNet values.</p>
           </li>
           <li class="roadmap__item">
             <span class="roadmap__badge">Future</span>
@@ -823,7 +1020,8 @@
       <nav class="footer__links" aria-label="External links">
         <h4 class="footer__heading">Links</h4>
         <ul>
-          <li><a href="https://github.com/Final-Project-Snap-3D/SegmentationModel_PP_AI" target="_blank" rel="noopener">Repository</a></li>
+          <li><a href="https://github.com/Final-Project-Snap-3D/SegmentationModel_PP_AI" target="_blank" rel="noopener">Repository (pipeline)</a></li>
+          <li><a href="https://github.com/Final-Project-Snap-3D/FE_APP_PP_AI" target="_blank" rel="noopener">Mobile app repository</a></li>
           <li><a href="https://github.com/Final-Project-Snap-3D" target="_blank" rel="noopener">GitHub organization</a></li>
           <li><a href="https://github.com/Final-Project-Snap-3D/SegmentationModel_PP_AI/blob/main/vggt_omega/api/API_SPEC.md" target="_blank" rel="noopener">API specification</a></li>
           <li><a href="https://vizwiz.org/tasks-and-datasets/salient-object-detection/" target="_blank" rel="noopener">VizWiz dataset</a></li>

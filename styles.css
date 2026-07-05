@@ -221,15 +221,37 @@ button:focus-visible {
 .nav__menu {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0; /* la separación la dan el padding de cada enlace + los divisores */
+}
+
+/* Cada apartado se diferencia con un divisor vertical sutil entre ellos */
+.nav__menu > li {
+  display: flex;
+  align-items: center;
+}
+
+.nav__menu > li + li::before {
+  content: "";
+  width: 1px;
+  height: 18px;
+  background-color: var(--color-border);
+}
+
+.nav__menu > li:last-child::before {
+  display: none; /* sin divisor justo antes del botón GitHub */
+}
+
+.nav__menu > li:last-child {
+  margin-left: 10px; /* separa el CTA del grupo de apartados */
 }
 
 .nav__menu a {
   display: inline-block;
-  padding: 8px 12px;
+  padding: 8px 11px;
   border-radius: var(--radius-sm);
   color: var(--color-text-muted);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  white-space: nowrap; /* el texto de cada apartado nunca pasa a 2 líneas */
   transition: color 0.2s ease, background-color 0.2s ease;
 }
 
@@ -370,19 +392,12 @@ button:focus-visible {
   display: flex;
   align-items: center;
   overflow: hidden;
-}
-
-.hero__media,
-.hero__video,
-.hero__media-fallback {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.hero__video {
-  object-fit: cover;
+  /* Subtle 3D-viewport grid to evoke a modeling scene (theme-aware, no asset) */
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 42px 42px;
+  background-position: center;
 }
 
 .hero__overlay {
@@ -392,17 +407,20 @@ button:focus-visible {
   padding-block: 40px;
 }
 
-/* Degradado para asegurar contraste del texto sobre el media */
+/* Soft accent glow behind the hero content (decorative, non-blocking) */
 .hero::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: radial-gradient(
-    ellipse at center,
-    var(--hero-overlay-start),
-    var(--hero-overlay-end)
-  );
+  pointer-events: none;
+  background:
+    radial-gradient(42% 55% at 18% 22%, var(--color-accent-soft), transparent 72%),
+    radial-gradient(
+      44% 58% at 84% 80%,
+      color-mix(in srgb, var(--color-accent-2) 15%, transparent),
+      transparent 72%
+    );
 }
 
 .hero__eyebrow {
@@ -789,7 +807,9 @@ button:focus-visible {
 /* =========================================================
    RESPONSIVE
    ========================================================= */
-@media (max-width: 860px) {
+/* La barra tiene muchos apartados: pasa a menú desplegable antes de que
+   lleguen a comprimirse o partirse en dos líneas. */
+@media (max-width: 1080px) {
   .nav__toggle {
     display: flex;
   }
@@ -801,8 +821,8 @@ button:focus-visible {
     right: 0;
     flex-direction: column;
     align-items: stretch;
-    gap: 4px;
-    padding: 16px 24px 24px;
+    gap: 2px;
+    padding: 12px 24px 20px;
     background-color: var(--color-bg-alt);
     box-shadow: var(--shadow);
     /* Oculto por defecto; .is-open lo muestra */
@@ -813,16 +833,37 @@ button:focus-visible {
     display: flex;
   }
 
+  /* En el desplegable los apartados se apilan: fuera divisores verticales;
+     se diferencian con una línea inferior sutil. */
+  .nav__menu > li {
+    display: block;
+  }
+
+  .nav__menu > li + li::before {
+    display: none;
+  }
+
+  .nav__menu > li:last-child {
+    margin-left: 0;
+  }
+
+  .nav__menu > li:not(:last-child) {
+    border-bottom: 1px solid color-mix(in srgb, var(--color-border) 55%, transparent);
+  }
+
   .nav__menu a {
+    display: block;
     padding: 12px 14px;
     font-size: 1rem;
   }
 
   .nav__cta {
     text-align: center;
-    margin-top: 6px;
+    margin-top: 8px;
   }
+}
 
+@media (max-width: 860px) {
   .section__grid {
     grid-template-columns: 1fr;
   }
@@ -1049,5 +1090,66 @@ button:focus-visible {
 @media (max-width: 720px) {
   .compare-grid--4 {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* =========================================================
+   FLUJO DE LA APP MÓVIL (capturas de pantalla en vertical)
+   Capturar → Computar → Resultado, una columna por pantalla.
+   ========================================================= */
+.app-flow {
+  margin-top: 36px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(20px, 3vw, 40px);
+  align-items: start;
+}
+
+.app-shot {
+  margin: 0;
+  text-align: center;
+}
+
+/* Las capturas son verticales: se limitan por altura y se centran, sin recorte */
+.app-shot__frame {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: 560px;
+  margin-inline: auto;
+  border-radius: 22px;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow);
+}
+
+.app-shot__step {
+  display: inline-block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  padding: 4px 12px;
+  margin: 16px 0 8px;
+  border-radius: 999px;
+  background-color: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.app-shot__cap {
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+}
+
+.app-shot__cap strong {
+  color: var(--color-text);
+}
+
+@media (max-width: 720px) {
+  .app-flow {
+    grid-template-columns: 1fr;
+    max-width: 340px;
+    margin-inline: auto;
+    gap: 36px;
   }
 }

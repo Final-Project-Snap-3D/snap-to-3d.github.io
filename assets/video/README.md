@@ -1,11 +1,10 @@
-# Vídeos
+# Video / animations
 
-Coloca aquí los vídeos en bucle (formato `.mp4`, H.264). Archivos referenciados (comentados) en `index.html`:
+Looping animations used by `index.html` (mirrored from the pipeline repo's `doc/` folder).
 
-- `hero.mp4` — vídeo de fondo del hero.
-- `demo-1.mp4` — reconstrucción de ejemplo.
-- `demo-2.mp4` — rotación 360°.
+- `demo_vggt.gif` — VGGT-Ω Gradio demo: point cloud + camera frustums orbiting.
+- `points.gif` — segmented point cloud (input to the mesher).
+- `mesh_render.gif` — reconstructed mesh turntable (green: Poisson · blue: Screened Poisson).
 
-Todos se reproducen con `autoplay muted loop playsinline`.
-Para activarlos, descomenta los bloques `<video>` correspondientes en `index.html`
-y elimina (o conserva como fallback) el `.media-placeholder` adyacente.
+The hero no longer uses a background video — its backdrop is drawn in CSS
+(subtle 3D grid + accent glow), so no `hero.mp4` asset is required.
