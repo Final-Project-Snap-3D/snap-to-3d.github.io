@@ -8,6 +8,7 @@ Real project figures used by `index.html` (mirrored from the pipeline repo's `do
 
 **Segmentation**
 - `image_to_mask.png`, `masks_u2.png`, `masks_yolo.png` — originals vs. U²-Net vs. YOLO masks.
+- `train_loss_unet.png`, `val_loss_unet.png`, `train_loss_u2net.png`, `val_loss_u2net.png` — W&B training/validation loss curves.
 - `morph_open_example.png` — worked morphological-opening example.
 - `img_base.jpeg`, `mask_003_mix.png`, `mask_003_u2.png`, `mask_003_yolo.png` — refinement approaches A/B/C.
 

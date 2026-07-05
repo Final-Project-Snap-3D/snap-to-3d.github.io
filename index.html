@@ -298,7 +298,8 @@
             with <em>skip connections</em>, implemented from scratch and trained
             on VizWiz with BCE + Dice loss (0.3 / 0.7), the AdamW optimizer and
             BatchNorm between convolution and ReLU to stabilize training from
-            zero. Results were not satisfactory: imprecise, unstable masks.
+            zero. Trained on a Google Compute Engine VM; results were not
+            satisfactory: imprecise, unstable masks.
           </p>
           <p>
             <strong>2 · U²-Net.</strong> The nested RSU blocks with
@@ -307,7 +308,10 @@
             different scales) and all of them are penalized during training:
             this gives a strong gradient to the intermediate layers and coherent
             multi-scale features. Much cleaner boundaries, though with residual
-            errors.
+            errors. Training on the same VM was slow given the model's depth, so
+            we <strong>stopped at 10 epochs</strong>: both losses were still
+            steadily decreasing and the masks were already clearly better than
+            UNet's, so a full run wasn't cost-effective.
           </p>
           <p>
             <strong>3 · YOLO26-seg (final choice).</strong> Fine-tuning of
@@ -321,6 +325,58 @@
             metric tracking in <strong>Weights &amp; Biases</strong>, so the
             comparison is fair.
           </p>
+        </div>
+
+        <!-- Training & validation loss curves (README §4.1) -->
+        <header class="section__header" style="margin-top: 56px;">
+          <h3 class="section__title" style="font-size: 1.5rem;">Training &amp; validation loss</h3>
+          <p class="section__lead section__lead--center">
+            Both trainable baselines were logged to
+            <strong>Weights &amp; Biases</strong>. UNet ran the full schedule;
+            U²-Net was stopped at 10 epochs with the losses still decreasing.
+          </p>
+        </header>
+
+        <div class="charts">
+          <div class="charts__group">
+            <span class="mask-row__label">UNet (from scratch)</span>
+            <div class="chart-grid">
+              <figure class="chart-card">
+                <img
+                  src="assets/img/train_loss_unet.png"
+                  alt="UNet training-loss curve falling from about 0.53 to 0.39 over 100 epochs"
+                  loading="lazy"
+                />
+              </figure>
+              <figure class="chart-card">
+                <img
+                  src="assets/img/val_loss_unet.png"
+                  alt="UNet validation-loss curve falling from about 0.49 to 0.375, noisier than the training loss"
+                  loading="lazy"
+                />
+              </figure>
+            </div>
+          </div>
+
+          <div class="charts__group">
+            <span class="mask-row__label mask-row__label--u2">U²-Net (10 epochs)</span>
+            <div class="chart-grid">
+              <figure class="chart-card">
+                <img
+                  src="assets/img/train_loss_u2net.png"
+                  alt="U²-Net training-loss curve falling smoothly from about 0.49 to 0.29 over 10 epochs"
+                  loading="lazy"
+                />
+              </figure>
+              <figure class="chart-card">
+                <img
+                  src="assets/img/val_loss_u2net.png"
+                  alt="U²-Net validation-loss curve falling smoothly from about 0.45 to 0.27 over 10 epochs"
+                  loading="lazy"
+                />
+              </figure>
+            </div>
+          </div>
         </div>
 
         <div class="data-table-wrap">
