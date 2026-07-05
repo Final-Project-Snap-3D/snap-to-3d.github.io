@@ -343,7 +343,7 @@
         <div class="data-table-wrap">
           <table class="data-table">
             <thead>
-              <tr><th>Model</th><th>IoU</th><th>Dice</th><th>Precision</th><th>Recall</th></tr>
+              <tr><th>Model</th><th>IoU</th><th>Dice</th><th>Precision *</th><th>Recall *</th></tr>
             </thead>
             <tbody>
               <tr><td>UNet (from scratch)</td><td>0.6201</td><td>0.7305</td><td>—</td><td>—</td></tr>
@@ -357,6 +357,15 @@
           wins on every metric (+0.110 IoU over U²-Net). Both models keep recall
           above precision: they slightly over-segment — the preferable failure
           mode for our use case.
+        </p>
+        <p class="table-note">
+          <strong>*</strong> Precision and Recall are each measured at the
+          model's own operating point (threshold 0.5 for UNet/U²-Net, confidence
+          0.25 for YOLO) and, for YOLO, after merging its per-instance masks into
+          one foreground mask. They are indicative rather than measured at a
+          matched operating point, and are more threshold-sensitive than
+          IoU/Dice. A unified, threshold-matched evaluation (precision–recall
+          curves) is left as future work.
         </p>
 
         <div class="mask-compare">
@@ -435,6 +444,34 @@
           thin bridges; then connected-component labeling (8-connectivity) keeps
           only the largest region per image: the object of interest.
         </p>
+
+        <div class="section__text" style="max-width: 820px; margin-inline: auto;">
+          <p>
+            <strong>What is a morphological opening?</strong> It is an
+            <strong>erosion</strong> followed by a <strong>dilation</strong> with
+            the same kernel. Erosion turns a pixel on only if the whole kernel
+            fits inside the object, so it strips a thin border, deletes specks
+            and cuts thin bridges. Dilation is the opposite and grows that border
+            back. The net effect: the main object returns to its original size,
+            but anything thinner than the kernel is erased for good.
+          </p>
+        </div>
+
+        <figure class="section__media section__media--wide" style="margin-top: 24px;">
+          <img
+            class="media-frame"
+            src="assets/img/morph_open_example.png"
+            alt="Morphological opening on an illustrative mask: original with speckle noise and a thin bridge, then erosion, then dilation"
+            loading="lazy"
+          />
+          <figcaption class="media-caption">
+            Opening on an illustrative mask. Erosion removes the specks and cuts
+            the thin bridge; dilation restores the main object. The right-hand
+            blob survives the opening (it is larger than the kernel) — that is
+            why <strong>keep-largest</strong> runs afterwards to drop the now
+            disconnected secondary region.
+          </figcaption>
+        </figure>
 
         <div class="compare-grid compare-grid--4">
           <figure class="compare-cell">
@@ -515,6 +552,39 @@
             Requires a CUDA GPU.
           </figcaption>
         </figure>
+
+        <header class="section__header" style="margin-top: 64px;">
+          <h3 class="section__title" style="font-size: 1.5rem;">Isolating the object</h3>
+          <p class="section__lead section__lead--center">
+            We don't crop the images or filter points in 3D — everything happens
+            through the per-pixel depth confidence.
+          </p>
+        </header>
+
+        <div class="section__text" style="max-width: 820px; margin-inline: auto;">
+          <p>
+            <strong>1 · Fuse mask and depth.</strong> Segmentation runs on the
+            same frames VGGT-Ω uses, so the binary mask <code>M</code> lines up
+            pixel-for-pixel with the depth <code>D</code> and its confidence
+            <code>C</code>. We simply multiply: <code>C' = C * M</code>, so every
+            background pixel ends up at 0. A depth-edge filter (removing stray
+            "flying pixels" at silhouettes) and a confidence percentile threshold
+            zero out more unreliable pixels on that same map. A point is kept only
+            where <code>C'</code> is above zero — so the background is gone.
+          </p>
+          <p>
+            <strong>2 · Unproject the object's depth.</strong> Each surviving
+            pixel <code>(u, v)</code> with depth <code>d</code> is back-projected
+            with the pinhole model using the view's intrinsics and extrinsics:
+            first to the camera frame
+            (<code>x = (u−cx)/fx · d</code>, <code>y = (v−cy)/fy · d</code>,
+            <code>z = d</code>), then to a shared world frame with the camera
+            pose. Doing this for every kept pixel of every view yields one fused,
+            coloured point cloud of the object — the views overlap because
+            VGGT-Ω already solved for a single shared geometry. That cloud is
+            what goes to the mesher.
+          </p>
+        </div>
 
         <header class="section__header" style="margin-top: 64px;">
           <h3 class="section__title" style="font-size: 1.5rem;">From point cloud to mesh</h3>
