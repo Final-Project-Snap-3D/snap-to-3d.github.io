@@ -140,39 +140,30 @@
 
     <!-- ===================== ¿QUÉ ES? ===================== -->
     <section class="section" id="que-es">
-      <div class="container section__grid">
-        <div class="section__text">
+      <div class="container">
+        <header class="section__header">
           <p class="section__eyebrow">Visión general</p>
           <h2 class="section__title">¿Qué es Snap to 3D?</h2>
-          <p class="section__lead">
+          <p class="section__lead section__lead--center">
             Snap-to-3D es una pipeline de extremo a extremo que convierte un
             puñado de fotos casuales de móvil de un objeto real en una malla 3D
             editable e imprimible, combinando visión por computador clásica y
             aprendizaje profundo.
           </p>
+        </header>
+
+        <div class="section__text" style="max-width: 760px; margin-inline: auto;">
           <p>
             El objetivo es hacer accesible la creación de activos 3D a
             cualquiera que tenga un teléfono. Aplicaciones concretas:
           </p>
-          <ul class="feature-list">
+          <ul class="feature-list feature-list--grid">
             <li><strong>E-commerce</strong> — vistas 3D de producto a partir de una sesión rápida de fotos.</li>
             <li><strong>Gemelos digitales</strong> — captura de activos físicos para simulación o inventario.</li>
             <li><strong>Patrimonio cultural</strong> — digitalización de objetos para su preservación y estudio.</li>
             <li><strong>Impresión 3D</strong> — mallas <em>watertight</em> listas para laminar e imprimir.</li>
           </ul>
         </div>
-
-        <figure class="section__media">
-          <img
-            class="media-frame"
-            src="assets/img/image_to_mask.png"
-            alt="Ejemplos de fotos de entrada y sus máscaras de segmentación del objeto"
-            loading="lazy"
-          />
-          <figcaption class="media-caption">
-            De la foto a la máscara binaria del objeto de interés.
-          </figcaption>
-        </figure>
       </div>
     </section>
 
@@ -320,14 +311,20 @@
 
         <div class="section__text" style="max-width: 820px; margin-inline: auto;">
           <p>
-            <strong>1 · UNet desde cero.</strong> Entrenada en VizWiz con loss
-            BCE + Dice (0.3 / 0.7), AdamW y aumentación con Albumentations a
-            512×512. Los resultados no fueron satisfactorios: máscaras
-            imprecisas e inestables.
+            <strong>1 · UNet desde cero.</strong> Encoder–decoder clásico con
+            <em>skip connections</em>, implementado de cero y entrenado en
+            VizWiz con loss BCE + Dice (0.3 / 0.7), optimizador AdamW y
+            BatchNorm entre convolución y ReLU para estabilizar el arranque.
+            Los resultados no fueron satisfactorios: máscaras imprecisas e
+            inestables.
           </p>
           <p>
-            <strong>2 · U²-Net.</strong> Los bloques RSU anidados con supervisión
-            profunda supusieron una mejora drástica: contornos mucho más
+            <strong>2 · U²-Net.</strong> Los bloques RSU anidados con
+            <strong>supervisión profunda</strong> supusieron una mejora
+            drástica. La red produce 7 máscaras (una fusionada + 6 salidas
+            laterales a distintas escalas) y todas se penalizan durante el
+            entrenamiento: esto da un gradiente fuerte a las capas intermedias y
+            features coherentes a múltiples escalas. Contornos mucho más
             limpios, aunque con errores residuales.
           </p>
           <p>
@@ -335,6 +332,12 @@
             modelo de segmentación de instancias de Ultralytics sobre VizWiz
             (una sola clase, <em>salient object</em>). Máscaras más limpias y
             robustas en nuestras imágenes objetivo.
+          </p>
+          <p class="table-note" style="margin-top: 4px;">
+            Las tres se entrenan a 512×512 con la misma aumentación
+            (flips, rotaciones, brillo/contraste, blur y ruido) y con
+            seguimiento de métricas en <strong>Weights &amp; Biases</strong>,
+            para que la comparación sea justa.
           </p>
         </div>
 
@@ -357,26 +360,43 @@
           ligeramente, el modo de fallo preferible para nuestro caso de uso.
         </p>
 
-        <div class="gallery" style="margin-top: 40px;">
-          <figure class="gallery__item">
+        <div class="mask-compare">
+          <figure class="mask-row">
+            <span class="mask-row__label">Fotos originales</span>
+            <img
+              class="media-frame"
+              src="assets/img/image_to_mask.png"
+              alt="Tres fotos originales: un ratón sobre el suelo, tres azulejos sobre una mesa y un gato"
+              loading="lazy"
+            />
+          </figure>
+          <figure class="mask-row">
+            <span class="mask-row__label mask-row__label--u2">Máscaras · U²-Net</span>
             <img
               class="media-frame"
               src="assets/img/masks_u2.png"
-              alt="Máscaras generadas por U²-Net"
+              alt="Máscaras de U²-Net para los mismos tres objetos"
               loading="lazy"
             />
-            <figcaption class="media-caption">Máscaras con U²-Net.</figcaption>
           </figure>
-          <figure class="gallery__item">
+          <figure class="mask-row">
+            <span class="mask-row__label mask-row__label--yolo">Máscaras · YOLO26-seg</span>
             <img
               class="media-frame"
               src="assets/img/masks_yolo.png"
-              alt="Máscaras generadas por YOLO26-seg"
+              alt="Máscaras de YOLO26-seg para los mismos tres objetos"
               loading="lazy"
             />
-            <figcaption class="media-caption">Máscaras con YOLO26-seg.</figcaption>
           </figure>
         </div>
+        <p class="table-note">
+          Los mismos tres objetos (ratón, azulejos y gato), segmentados por cada
+          modelo — las columnas están alineadas. Se aprecia el modo de fallo de
+          cada uno: <strong>U²-Net</strong> da máscaras más blandas y funde los
+          dos azulejos contiguos en una sola mancha; <strong>YOLO26-seg</strong>
+          separa cada azulejo como instancia y entrega bordes más nítidos. Ambos
+          motivan el refinado posterior.
+        </p>
 
         <header class="section__header" style="margin-top: 64px;">
           <h3 class="section__title" style="font-size: 1.5rem;">Refinado de máscaras</h3>
