@@ -999,3 +999,55 @@ button:focus-visible {
 .mask-row .media-frame {
   border-color: transparent;
 }
+
+/* =========================================================
+   REJILLA DE COMPARACIÓN (entrada + enfoques A/B/C del refinado)
+   ========================================================= */
+.compare-grid {
+  margin-top: 32px;
+  display: grid;
+  gap: 18px;
+}
+
+.compare-grid--4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.compare-cell {
+  margin: 0;
+  text-align: center;
+}
+
+.compare-cell .media-frame {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  background-color: #000;
+}
+
+.compare-cell__cap {
+  margin-top: 10px;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: var(--color-text-muted);
+}
+
+.compare-cell__cap strong {
+  color: var(--color-text);
+}
+
+/* Celda elegida (enfoque C): resaltada con el color de acento */
+.compare-cell--pick .media-frame {
+  border-color: var(--color-accent-2);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent-2) 45%, transparent);
+}
+
+.compare-cell--pick .compare-cell__cap strong {
+  color: var(--color-accent-2);
+}
+
+@media (max-width: 720px) {
+  .compare-grid--4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

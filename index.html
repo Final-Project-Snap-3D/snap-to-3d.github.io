@@ -271,10 +271,13 @@
               pipeline debe afrontar que las de un dataset de estudio.
             </p>
             <p>
-              Las anotaciones son polígonos del objeto saliente (un JSON por
-              split) que rasterizamos a máscaras binarias con
-              <code>cv2.fillPoly</code>. Usamos directamente los splits
-              oficiales del challenge VizWiz SOD, sin re-particionar.
+              Dos rasgos condicionan la tarea de aprendizaje: el
+              <strong>68 % de las imágenes llevan texto superpuesto</strong>
+              sobre el objeto saliente, y este suele <strong>ocupar buena parte
+              del encuadre</strong>. Las anotaciones son polígonos del objeto
+              (un JSON por split) que rasterizamos a máscaras binarias con
+              <code>cv2.fillPoly</code>; usamos los splits oficiales del
+              challenge VizWiz SOD, sin re-particionar.
             </p>
           </div>
 
@@ -347,7 +350,7 @@
               <tr><th>Modelo</th><th>IoU</th><th>Dice</th><th>Precision</th><th>Recall</th></tr>
             </thead>
             <tbody>
-              <tr><td>UNet (desde cero)</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>UNet (desde cero)</td><td>0.6201</td><td>0.7305</td><td>—</td><td>—</td></tr>
               <tr><td>U²-Net</td><td>0.7765</td><td>0.8397</td><td>0.8366</td><td>0.8987</td></tr>
               <tr class="is-highlight"><td>YOLO26-seg (fine-tuned)</td><td>0.8866</td><td>0.9206</td><td>0.9057</td><td>0.9584</td></tr>
             </tbody>
@@ -436,6 +439,30 @@
           pequeñas y puentes finos; después, un etiquetado de componentes
           conexas (conectividad-8) conserva solo la región de mayor área por
           imagen: el objeto de interés.
+        </p>
+
+        <div class="compare-grid compare-grid--4">
+          <figure class="compare-cell">
+            <img class="media-frame" src="assets/img/img_base.jpeg" alt="Foto de entrada: un ventilador de torre en una habitación con suelo hidráulico" loading="lazy" />
+            <figcaption class="compare-cell__cap"><strong>Entrada</strong><br />Foto original</figcaption>
+          </figure>
+          <figure class="compare-cell">
+            <img class="media-frame" src="assets/img/mask_003_mix.png" alt="Máscara del enfoque A: intersección YOLO y U²-Net" loading="lazy" />
+            <figcaption class="compare-cell__cap"><strong>A</strong><br />YOLO ∩ U²-Net</figcaption>
+          </figure>
+          <figure class="compare-cell">
+            <img class="media-frame" src="assets/img/mask_003_u2.png" alt="Máscara del enfoque B: U²-Net con apertura morfológica" loading="lazy" />
+            <figcaption class="compare-cell__cap"><strong>B</strong><br />U²-Net + apertura</figcaption>
+          </figure>
+          <figure class="compare-cell compare-cell--pick">
+            <img class="media-frame" src="assets/img/mask_003_yolo.png" alt="Máscara del enfoque C, el elegido: YOLO con apertura morfológica" loading="lazy" />
+            <figcaption class="compare-cell__cap"><strong>C ✓</strong><br />YOLO + apertura</figcaption>
+          </figure>
+        </div>
+        <p class="table-note">
+          El mismo ventilador con los tres enfoques. El elegido es el
+          <strong>C</strong> (<code>--seg-checkpoint &lt;yolo&gt;.pt --morph-open --keep-largest</code>):
+          bordes nítidos, ruido residual eliminado y el objeto sin erosionar.
         </p>
       </div>
     </section>
